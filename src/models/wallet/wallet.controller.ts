@@ -7,17 +7,17 @@ import { JwtPayload } from 'jsonwebtoken';
 
 const addMoney = createAsyncFunction(async (req: Request, res: Response) => {
   const { userId } = req.user as JwtPayload;
-  const data = await walletServices.addMoney(userId, req.body);
+  const amount = Number(req.body.amount);
+  const data = await walletServices.addMoney(userId, amount);
 
   //send response
   sendResponse(res, {
     statusCode: httpStatusCode.CREATED,
     success: true,
-    message: 'Kk',
+    message: 'Money added successfully',
     data,
   });
 });
-
 
 export const walletController = {
   addMoney,

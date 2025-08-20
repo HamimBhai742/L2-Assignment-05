@@ -2,7 +2,7 @@ import { session } from 'passport';
 import httpStatusCode from 'http-status-codes';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';
-import { IUser } from './user.interface';
+import { IUser, Role } from './user.interface';
 import { User } from './user.model';
 import bcryptjs from 'bcrypt';
 
@@ -35,6 +35,13 @@ const createUser = async (payload: Partial<IUser>) => {
   };
 };
 
+//update agent status
+const updateAgentStatus = async (id: string, status: string) => {
+  const isExistAgent = await User.findOne({ _id: id, role: Role.AGENT });
+  console.log(isExistAgent);
+};
+
 export const userServices = {
   createUser,
+  updateAgentStatus,
 };

@@ -27,13 +27,18 @@ export const checkAuth =
       if (!isExist) {
         throw new AppError('User not found', httpStatusCode.NOT_FOUND);
       }
-      if (
-        isExist.status === UserStatus.BLOCKED ||
-        isExist.agentStatus === AgentStatus.PENDING ||
-        isExist.agentStatus === AgentStatus.SUSPEND
+
+      if (isExist?.status === UserStatus.BLOCKED) {
+        throw new AppError(
+          `User is ${isExist.status}`,
+          httpStatusCode.FORBIDDEN
+        );
+      } else if (
+        isExist?.agentStatus === AgentStatus.PENDING ||
+        isExist?.agentStatus === AgentStatus.SUSPEND
       ) {
         throw new AppError(
-          `${isExist.role} is ${isExist.status || isExist.agentStatus}`,
+          `Agent is ${isExist?.agentStatus}`,
           httpStatusCode.FORBIDDEN
         );
       }
@@ -42,7 +47,7 @@ export const checkAuth =
       if (!isExistWallet) {
         throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
       }
-      
+
       if (isExistWallet.status === WalletStatus.BLOCKED) {
         throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
       }
