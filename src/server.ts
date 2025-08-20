@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import mongoose from 'mongoose';
-import { app } from '../app';
+import { app } from './app';
 
 const PORT = process.env.SERVER_PORT || 3000;
 let server: Server;
@@ -16,3 +16,4 @@ const startServer = async () => {
   }
 };
 startServer()
+
