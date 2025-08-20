@@ -11,4 +11,12 @@ router.patch(
   userController.updateAgentStatus
 );
 
+router.patch(
+  '/user-status/:id',
+  checkAuth(Role.ADMIN),
+  userController.updateUserStatus
+);
+
+
+
 export const adminRoutes = router;

@@ -33,7 +33,39 @@ const updateAgentStatus = createAsyncFunction(
   }
 );
 
+const updateUserStatus = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const data = await userServices.updateUserStatus(id, status);
+
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.OK,
+      success: true,
+      message: data.message,
+      data: data.data,
+    });
+  }
+);
+
+const getAllTransactin = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const data = await userServices.getAllTransaction();
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.OK,
+      success: true,
+      message: 'All transaction retrived successfully',
+      data,
+    });
+  }
+);
+
 export const userController = {
   createUser,
   updateAgentStatus,
+  updateUserStatus,
+  getAllTransactin
 };

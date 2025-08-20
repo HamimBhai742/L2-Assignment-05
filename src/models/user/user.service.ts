@@ -1,11 +1,10 @@
-import { session } from 'passport';
 import httpStatusCode from 'http-status-codes';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';
-import { AgentStatus, IUser, Role } from './user.interface';
+import { AgentStatus, IUser, Role, UserStatus } from './user.interface';
 import { User } from './user.model';
 import bcryptjs from 'bcrypt';
-import { success } from 'zod';
+import { Transaction } from '../transaction/transaction.model';
 
 //create new user
 const createUser = async (payload: Partial<IUser>) => {
@@ -48,13 +47,22 @@ const updateAgentStatus = async (id: string, status: string) => {
   const agentUpSatus = status.toLowerCase();
   const isExistAgent = await User.findOne({ _id: id, role: Role.AGENT });
   if (!isExistAgent) {
-    throw new AppError('This ID does not belong to the agent.', httpStatusCode.BAD_REQUEST);
+    throw new AppError(
+      'This ID does not belong to the agent.',
+      httpStatusCode.BAD_REQUEST
+    );
   }
   const agentStatus: string[] = Object.values(AgentStatus);
   if (!agentStatus.includes(agentUpSatus)) {
     throw new AppError(
       'Please provide valid status.',
       httpStatusCode.BAD_REQUEST
+    );
+  }
+  if (isExistAgent.agentStatus === agentUpSatus) {
+    throw new AppError(
+      `Agent already ${agentUpSatus}`,
+      httpStatusCode.FORBIDDEN
     );
   }
   await User.findByIdAndUpdate(id, {
@@ -70,7 +78,48 @@ const updateAgentStatus = async (id: string, status: string) => {
   };
 };
 
+//update user status
+const updateUserStatus = async (id: string, status: string) => {
+  const userUpSatus = status.toLowerCase();
+  const isExistUser = await User.findOne({ _id: id, role: Role.USER });
+  if (!isExistUser) {
+    throw new AppError(
+      'This ID does not belong to the user.',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+  const agentStatus: string[] = Object.values(UserStatus);
+  if (!agentStatus.includes(userUpSatus)) {
+    throw new AppError(
+      'Please provide valid status.',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+  if (isExistUser.status === userUpSatus) {
+    throw new AppError(`User already ${userUpSatus}`, httpStatusCode.FORBIDDEN);
+  }
+  await User.findByIdAndUpdate(id, {
+    status: userUpSatus,
+  });
+  return {
+    success: true,
+    message: `User status ${userUpSatus} successfully`,
+    data: {
+      status: userUpSatus,
+      role: Role.USER,
+    },
+  };
+};
+
+//all trabsaction
+const getAllTransaction = async () => {
+  const allTransaction = await Transaction.find();
+  return allTransaction;
+};
+
 export const userServices = {
   createUser,
   updateAgentStatus,
+  updateUserStatus,
+  getAllTransaction
 };
