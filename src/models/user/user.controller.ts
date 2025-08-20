@@ -15,6 +15,6 @@ const createUser = createAsyncFunction(async (req: Request, res: Response) => {
   });
 });
 
-const userController = {
+export const userController = {
   createUser,
 };
