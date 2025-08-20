@@ -3,7 +3,7 @@ import { IWallet, WalletStatus } from "./wallet.interface";
 
 const walletSchema = new Schema<IWallet>({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  balance: { type: Number, required: true, default: 50 },
+  balance: { type: Number,  default: 50 },
   status: { type: String, enum: WalletStatus, default: WalletStatus.ACTIVE },
 },{
   timestamps: true,

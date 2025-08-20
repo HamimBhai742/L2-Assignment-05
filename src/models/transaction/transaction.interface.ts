@@ -17,10 +17,10 @@ export enum TransactionStatus {
 export interface ITransaction {
   type: TransactionType;
   transactionId: string;
-  form: Types.ObjectId;
-  to: Types.ObjectId;
+  from?: Types.ObjectId;
+  to?: Types.ObjectId;
   amount: number;
   status: TransactionStatus;
-  fee: number;
+  fee?: number;
   initiatedBy: Types.ObjectId;
 }

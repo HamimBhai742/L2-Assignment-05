@@ -7,13 +7,21 @@ import {
 
 const transactionSchema = new Schema<ITransaction>(
   {
-    type: { type: String, enum: TransactionType, required: true },
+    type: {
+      type: String,
+      enum: Object.values(TransactionType),
+      required: true,
+    },
     transactionId: { type: String, required: true },
-    form: { type: Schema.Types.ObjectId, ref: 'Wallet', required: true },
-    to: { type: Schema.Types.ObjectId, ref: 'Wallet', required: true },
+    from: { type: Schema.Types.ObjectId, ref: 'Wallet' },
+    to: { type: Schema.Types.ObjectId, ref: 'Wallet' },
     amount: { type: Number, required: true },
-    status: { type: String, enum: TransactionStatus, required: true },
-    fee: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: Object.values(TransactionStatus),
+      required: true,
+    },
+    fee: { type: Number, default: 0 },
     initiatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   {
@@ -22,4 +30,7 @@ const transactionSchema = new Schema<ITransaction>(
   }
 );
 
-export const Transaction = model<ITransaction>('Transaction', transactionSchema);
+export const Transaction = model<ITransaction>(
+  'Transaction',
+  transactionSchema
+);

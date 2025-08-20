@@ -1,21 +1,26 @@
 export enum AgentStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
 }
 
 export enum Role {
-  USER = 'USER',
-  AGENT = 'AGENT',
-  ADMIN = 'ADMIN',
+  USER = 'user',
+  AGENT = 'agent',
+  ADMIN = 'admin',
+}
+
+export enum IsActive {
+  ACTIVE = 'active',
+  BLOCKED = 'blocked',
 }
 
 export interface IUser {
+  _id?: string;
   name: string;
   phone: string;
-  email: string;
   password: string;
-  role: Role;
-  isActive: boolean;
+  role?: Role;
+  isActive: IsActive;
   agentStatus?: AgentStatus;
 }

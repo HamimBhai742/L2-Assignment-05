@@ -1,11 +1,11 @@
 import { Types } from 'mongoose';
 
 export enum WalletStatus {
-  ACTIVE = 'ACTIVE',
-  BLOCKED = 'BLOCKED',
+  ACTIVE = 'active',
+  BLOCKED = 'blocked',
 }
 export interface IWallet {
   user: Types.ObjectId;
-  balance: number;
-  status: WalletStatus;
+  balance?: number;
+  status?: WalletStatus;
 }
