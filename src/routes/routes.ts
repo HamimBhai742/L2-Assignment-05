@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { userRoutes } from '../models/user/user.routes';
 import { authRoutes } from '../models/auth/auth.routes';
+import { walletRoutes } from '../models/wallet/wallet.routes';
 
 export const router = Router();
 
@@ -12,7 +13,11 @@ const routes = [
   {
     path: '/auth',
     route: authRoutes,
-  }
+  },
+  {
+    path: '/wallets',
+    route: walletRoutes,
+  },
 ];
 
 routes.forEach((route) => {
