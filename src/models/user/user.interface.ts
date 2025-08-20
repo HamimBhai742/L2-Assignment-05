@@ -13,6 +13,7 @@ export enum Role {
 export interface IUser {
   name: string;
   phone: string;
+  email: string;
   password: string;
   role: Role;
   isActive: boolean;
