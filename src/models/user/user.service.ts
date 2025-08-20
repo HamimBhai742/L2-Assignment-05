@@ -1,3 +1,4 @@
+import { session } from 'passport';
 import httpStatusCode from 'http-status-codes';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';

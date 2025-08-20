@@ -12,5 +12,7 @@ export const createUserToken = (user: Partial<IUser>) => {
     process.env.JWT_SECRET as string,
     process.env.JWT_EXPIRATION as string
   );
-  return token;
+  return {
+    accessToken: token,
+  };
 };

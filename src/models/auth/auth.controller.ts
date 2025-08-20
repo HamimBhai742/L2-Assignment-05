@@ -5,6 +5,7 @@ import httpStatusCode from 'http-status-codes';
 import passport from 'passport';
 import { AppError } from '../../error/coustom.error.handel';
 import { createUserToken } from '../../utils/jwt.token';
+import { setCookies } from '../../utils/set.cookies';
 const loggedInUser = createAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local', async (err: any, user: any, info: any) => {
@@ -18,8 +19,9 @@ const loggedInUser = createAsyncFunction(
         return next(new AppError(info.message, httpStatusCode.UNAUTHORIZED));
       }
 
-      const accessToken = createUserToken(user);
-
+      const userToken = createUserToken(user);
+      setCookies(res, userToken);
+      
       const userData = { ...user.toObject() };
       delete userData.password; // Remove password from user data
       //send response
@@ -28,12 +30,14 @@ const loggedInUser = createAsyncFunction(
         success: true,
         message: 'You have logged in successfully',
         data: {
-          accessToken,
+          accessToken: userToken.accessToken,
           user: userData,
         },
       });
-    });
+    })(req, res, next);
   }
 );
 
-
+export const authController = {
+  loggedInUser,
+};

@@ -5,13 +5,26 @@ import { globalErrorHandler } from './middlewares/global.error.handaler';
 import { notFound } from './middlewares/not.found';
 import { router } from './routes/routes';
 import passport from 'passport';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import { urlencoded } from 'body-parser';
 import './config/passport';
 
 export const app: Application = express();
+app.use(
+  session({
+    secret: process.env.EXPRESS_SESSION as string,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use(express.json());
+app.use(cookieParser());
+app.use(urlencoded());
 
 app.use(
   cors({

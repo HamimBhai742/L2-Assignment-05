@@ -22,6 +22,7 @@ const transactionSchema = new Schema<ITransaction>(
       required: true,
     },
     fee: { type: Number, default: 0 },
+    commission: { type: Number, default: 0 },
     initiatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   {
