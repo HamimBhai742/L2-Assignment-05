@@ -15,7 +15,6 @@ const userSchema = new Schema<IUser>(
     agentStatus: {
       type: String,
       enum: Object.values(AgentStatus),
-      default: AgentStatus.PENDING,
     },
   },
   {
@@ -31,7 +30,6 @@ userSchema.pre('save', function (next) {
     }
   } else {
     this.agentStatus = undefined;
-    delete this.agentStatus;
   }
   next();
 });

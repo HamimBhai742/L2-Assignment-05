@@ -2,13 +2,21 @@ import { session } from 'passport';
 import httpStatusCode from 'http-status-codes';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';
-import { IUser, Role } from './user.interface';
+import { AgentStatus, IUser, Role } from './user.interface';
 import { User } from './user.model';
 import bcryptjs from 'bcrypt';
+import { success } from 'zod';
 
 //create new user
 const createUser = async (payload: Partial<IUser>) => {
   const { password, phone, role, ...reset } = payload;
+  const isExsistUser = await User.findOne({ phone });
+  if (isExsistUser) {
+    throw new AppError(
+      `This ${role} is already exsist`,
+      httpStatusCode.FORBIDDEN
+    );
+  }
   const hashPassword = await bcryptjs.hash(password as string, 10);
 
   const user = await User.create({
@@ -37,8 +45,29 @@ const createUser = async (payload: Partial<IUser>) => {
 
 //update agent status
 const updateAgentStatus = async (id: string, status: string) => {
+  const agentUpSatus = status.toLowerCase();
   const isExistAgent = await User.findOne({ _id: id, role: Role.AGENT });
-  console.log(isExistAgent);
+  if (!isExistAgent) {
+    throw new AppError('This ID does not belong to the agent.', httpStatusCode.BAD_REQUEST);
+  }
+  const agentStatus: string[] = Object.values(AgentStatus);
+  if (!agentStatus.includes(agentUpSatus)) {
+    throw new AppError(
+      'Please provide valid status.',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+  await User.findByIdAndUpdate(id, {
+    agentStatus: agentUpSatus,
+  });
+  return {
+    success: true,
+    message: `Agent status ${agentUpSatus} successfully`,
+    data: {
+      agentStatus: agentUpSatus,
+      role: Role.AGENT,
+    },
+  };
 };
 
 export const userServices = {

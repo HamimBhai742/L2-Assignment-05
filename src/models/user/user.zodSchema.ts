@@ -9,7 +9,6 @@ export const createUserZodSchema = z.object({
     .string()
     .min(11)
     .regex(/^(?:\+?88)?01[3-9]\d{8}$/, 'Invalid Bangladesh Number'),
-  email: z.string().email('Please provide a valid email'),
   password: z
     .string()
     .min(6, 'Pin must be at least 6 characters long')

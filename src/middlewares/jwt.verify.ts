@@ -54,7 +54,7 @@ export const checkAuth =
 
       if (!authRole.includes(decoded.role)) {
         throw new AppError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this route',
           httpStatusCode.FORBIDDEN
         );
       }

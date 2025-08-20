@@ -19,16 +19,16 @@ const createUser = createAsyncFunction(async (req: Request, res: Response) => {
 const updateAgentStatus = createAsyncFunction(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { agentStatus } = req.body;
 
-    const data = await userServices.updateAgentStatus(id, status);
+    const data = await userServices.updateAgentStatus(id, agentStatus);
 
     //send response
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
       success: true,
       message: data.message,
-      data: data.user,
+      data: data.data,
     });
   }
 );
