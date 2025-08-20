@@ -5,6 +5,8 @@ import { verifyJwtToken } from '../utils/token.create.verfy.fn';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/user/user.model';
 import { AgentStatus, UserStatus } from '../models/user/user.interface';
+import { Wallet } from '../models/wallet/wallet.model';
+import { WalletStatus } from '../models/wallet/wallet.interface';
 export const checkAuth =
   (...authRole: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
@@ -35,6 +37,16 @@ export const checkAuth =
           httpStatusCode.FORBIDDEN
         );
       }
+      const isExistWallet = await Wallet.findOne({ user: isExist._id });
+
+      if (!isExistWallet) {
+        throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+      }
+      
+      if (isExistWallet.status === WalletStatus.BLOCKED) {
+        throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
+      }
+
       if (!authRole.includes(decoded.role)) {
         throw new AppError(
           'You do not have permission to access this resource',
@@ -42,7 +54,7 @@ export const checkAuth =
         );
       }
       req.user = decoded;
-      next()
+      next();
     } catch (error) {
       next(error);
     }
