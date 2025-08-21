@@ -10,9 +10,10 @@ import { AppError } from '../../error/coustom.error.handel';
 import { env } from '../../config/env';
 import { User } from '../user/user.model';
 import { Role, UserStatus } from '../user/user.interface';
-const generateTranxId = () => {
-  return `txn_${Date.now()}`;
-};
+interface Payload {
+  to: string;
+  amount: number;
+}
 
 //add money to wallet
 const addMoney = async (userId: string, amount: number) => {
@@ -137,13 +138,8 @@ const withdrawMoney = async (userId: string, amount: number) => {
   }
 };
 
-interface SendMoneyPayload {
-  to: string;
-  amount: number;
-}
-
 //send money to another user wallet
-const sendMoney = async (userId: string, payload: SendMoneyPayload) => {
+const sendMoney = async (userId: string, payload: Payload) => {
   const { to, amount } = payload;
   if (!to && !amount) {
     throw new AppError(
@@ -215,7 +211,8 @@ const sendMoney = async (userId: string, payload: SendMoneyPayload) => {
     if (amount > 100) {
       fee = 5;
     }
-    const updateSenderAmount = Number(senderWallet.balance) - Number(amount)-fee;
+    const updateSenderAmount =
+      Number(senderWallet.balance) - Number(amount) - fee;
     const updateReceiverAmount =
       Number(receiverWallet.balance) + Number(amount);
 
@@ -259,9 +256,139 @@ const sendMoney = async (userId: string, payload: SendMoneyPayload) => {
     await session.commitTransaction();
     session.endSession();
     return {
-      message: 'Send money successfully complete',
+      message: 'Send money successfully',
       senderTransaction,
       receiverTransaction,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+//cash in agent add to user wallet
+const cashIn = async (agentId: string, payload: Payload) => {
+  const { to, amount } = payload;
+  if (!to && !amount) {
+    throw new AppError(
+      'CashIn number and amount are required',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+
+  const session = await Wallet.startSession();
+  session.startTransaction();
+
+  const trnxId = [...Array(10)]
+    .map(() => `${env.TRNX_SECRET}`[Math.floor(Math.random() * 32)])
+    .join('');
+
+  try {
+    const recipientUser = await User.findOne({
+      phone: to,
+    });
+
+    if (!recipientUser) {
+      throw new AppError('Recipient user not found.', httpStatusCode.NOT_FOUND);
+    }
+
+    if (recipientUser._id.toString() === agentId) {
+      throw new AppError(
+        'You cannot cash-in to yourself',
+        httpStatusCode.BAD_REQUEST
+      );
+    }
+
+    if (recipientUser.status === UserStatus.BLOCKED) {
+      throw new AppError('Recipient is blocked', httpStatusCode.FORBIDDEN);
+    }
+
+    if (recipientUser.role !== Role.USER) {
+      throw new AppError('Recipient is not a user', httpStatusCode.FORBIDDEN);
+    }
+
+    const senderWallet = await Wallet.findOne({ user: agentId });
+    const recipientWallet = await Wallet.findOne({ user: recipientUser._id });
+
+    if (!senderWallet) {
+      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    }
+
+    if (!recipientWallet) {
+      throw new AppError(
+        'Recipient wallet not found',
+        httpStatusCode.NOT_FOUND
+      );
+    }
+
+    if (senderWallet.status === WalletStatus.BLOCKED) {
+      throw new AppError('Sender wallet is blocked', httpStatusCode.FORBIDDEN);
+    }
+
+    if (recipientWallet.status === WalletStatus.BLOCKED) {
+      throw new AppError(
+        'Recipient wallet is blocked',
+        httpStatusCode.FORBIDDEN
+      );
+    }
+
+    if (amount < 10) {
+      throw new AppError(
+        'Minimum amount to send is 50',
+        httpStatusCode.BAD_REQUEST
+      );
+    }
+    const commission = Number(amount / 1000) * 4.5;
+    const updateSenderAmount =
+      Number((senderWallet.balance as number) + commission) - Number(amount);
+
+    const updateRecipientAmount =
+      Number(recipientWallet.balance) + Number(amount);
+
+    if (updateSenderAmount < 0) {
+      throw new AppError('Insufficient balance', httpStatusCode.BAD_REQUEST);
+    }
+
+    await Wallet.findOneAndUpdate(
+      { user: agentId },
+      { balance: updateSenderAmount },
+      { new: true, runValidators: true, session }
+    );
+
+    await Wallet.findOneAndUpdate(
+      { user: recipientUser._id },
+      { balance: updateRecipientAmount },
+      { new: true, runValidators: true, session }
+    );
+
+    const senderTransaction = await Transaction.create({
+      type: TransactionType.WITHDRAW,
+      transactionId: trnxId,
+      from: agentId,
+      to: recipientUser._id,
+      amount: amount,
+      commission,
+      status: TransactionStatus.COMPLETED,
+      initiatedBy: agentId,
+    });
+
+    const recipientTransaction = await Transaction.create({
+      type: TransactionType.CASH_IN,
+      transactionId: trnxId,
+      from: agentId,
+      to: recipientUser._id,
+      amount: amount,
+      status: TransactionStatus.COMPLETED,
+      initiatedBy: recipientUser._id,
+    });
+
+    await session.commitTransaction();
+    session.endSession();
+    return {
+      message: 'Cash-in successfully',
+      senderTransaction,
+      recipientTransaction,
     };
   } catch (error) {
     await session.abortTransaction();
@@ -274,4 +401,5 @@ export const walletServices = {
   addMoney,
   withdrawMoney,
   sendMoney,
+  cashIn
 };
