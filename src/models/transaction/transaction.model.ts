@@ -13,8 +13,8 @@ const transactionSchema = new Schema<ITransaction>(
       required: true,
     },
     transactionId: { type: String, required: true },
-    from: { type: Schema.Types.ObjectId, ref: 'Wallet' },
-    to: { type: Schema.Types.ObjectId, ref: 'Wallet' },
+    from: { type: Schema.Types.ObjectId, ref: 'User' },
+    to: { type: Schema.Types.ObjectId, ref: 'User' },
     amount: { type: Number, required: true },
     status: {
       type: String,

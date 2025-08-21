@@ -1,3 +1,4 @@
+import { env } from '../config/env';
 import { IUser } from '../models/user/user.interface';
 import { createJwtToken } from './token.create.verfy.fn';
 
@@ -9,8 +10,8 @@ export const createUserToken = (user: Partial<IUser>) => {
   };
   const token = createJwtToken(
     jsonPayload,
-    process.env.JWT_SECRET as string,
-    process.env.JWT_EXPIRATION as string
+    env.JWT_SECRET ,
+    env.JWT_EXPIRATION
   );
   return {
     accessToken: token,

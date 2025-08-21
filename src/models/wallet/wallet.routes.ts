@@ -6,4 +6,6 @@ const router = Router();
 
 router.post('/add-money', checkAuth(Role.USER), walletController.addMoney);
 
+router.post('/withdraw-money', checkAuth(Role.USER), walletController.withdrawMoney);
+
 export const walletRoutes = router;

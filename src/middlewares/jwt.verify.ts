@@ -7,6 +7,7 @@ import { User } from '../models/user/user.model';
 import { AgentStatus, UserStatus } from '../models/user/user.interface';
 import { Wallet } from '../models/wallet/wallet.model';
 import { WalletStatus } from '../models/wallet/wallet.interface';
+import { env } from '../config/env';
 export const checkAuth =
   (...authRole: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,10 +19,7 @@ export const checkAuth =
           httpStatusCode.BAD_REQUEST
         );
       }
-      const decoded = verifyJwtToken(
-        token,
-        process.env.JWT_SECRET as string
-      ) as JwtPayload;
+      const decoded = verifyJwtToken(token, env.JWT_SECRET) as JwtPayload;
 
       const isExist = await User.findOne({ phone: decoded?.phone });
       if (!isExist) {

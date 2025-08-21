@@ -17,6 +17,10 @@ router.patch(
   userController.updateUserStatus
 );
 
-
+router.get(
+  '/all-transactions',
+  checkAuth(Role.ADMIN),
+  userController.getAllTransactin
+);
 
 export const adminRoutes = router;
