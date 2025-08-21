@@ -7,6 +7,8 @@ export enum TransactionType {
   RECEIVE_MONEY = 'receive_money',
   CASH_IN = 'cash_in',
   CASH_OUT = 'cash_out',
+  COMMISSION = 'commission',
+  FEE = 'fee',
 }
 export enum TransactionStatus {
   PENDING = 'pending',

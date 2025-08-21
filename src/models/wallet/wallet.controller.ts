@@ -62,10 +62,7 @@ const cashIn = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.CREATED,
     success: true,
     message: data.message,
-    data: {
-      sender: data.senderTransaction,
-      receiver: data.recipientTransaction,
-    },
+    data: data.transaction,
   });
 });
 
@@ -73,5 +70,5 @@ export const walletController = {
   addMoney,
   withdrawMoney,
   sendMoney,
-  cashIn
+  cashIn,
 };
