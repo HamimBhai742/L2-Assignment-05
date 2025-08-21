@@ -15,5 +15,10 @@ router.get(
   checkAuth(Role.USER),
   transactionController.getMyTransactoins
 );
+router.get(
+  '/commission/me',
+  checkAuth(Role.AGENT),
+  transactionController.getCommissionTransactoins
+);
 
 export const transactionRoutes=router

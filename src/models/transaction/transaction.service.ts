@@ -1,3 +1,4 @@
+import { TransactionType } from './transaction.interface';
 import { Transaction } from './transaction.model';
 
 //all transaction
@@ -15,7 +16,21 @@ const getMyTransactoins = async (id: string) => {
     total,
   };
 };
+
+//view commission transaction
+const getCommissionTransactoins = async (id: string) => {
+  const commissionTnx = await Transaction.find({
+    initiatedBy: id,
+    type: TransactionType.COMMISSION,
+  });
+  const total = await Transaction.countDocuments({ initiatedBy: id });
+  return {
+    commissionTnx,
+    total,
+  };
+};
 export const transactionServices = {
   getAllTransaction,
   getMyTransactoins,
+  getCommissionTransactoins,
 };

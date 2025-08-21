@@ -35,7 +35,25 @@ const getMyTransactoins = createAsyncFunction(
   }
 );
 
+const getCommissionTransactoins = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const { userId } = req.user as JwtPayload;
+    const data = await transactionServices.getCommissionTransactoins(userId);
+    //send response
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatusCode.OK,
+      metadata: {
+        total: data.total,
+      },
+      message: 'My transaction retrived successfully',
+      data: data.commissionTnx,
+    });
+  }
+);
+
 export const transactionController = {
   getAllTransactin,
   getMyTransactoins,
+  getCommissionTransactoins
 };
