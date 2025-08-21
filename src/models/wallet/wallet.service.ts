@@ -10,6 +10,10 @@ import { AppError } from '../../error/coustom.error.handel';
 import { env } from '../../config/env';
 import { User } from '../user/user.model';
 import { Role, UserStatus } from '../user/user.interface';
+import {
+  createTransaction,
+  createTransactionType,
+} from '../../utils/transaction';
 interface Payload {
   to: string;
   amount: number;
@@ -372,11 +376,30 @@ const cashIn = async (agentId: string, payload: Payload) => {
       status: TransactionStatus.COMPLETED,
       initiatedBy: agentId,
     });
+
+    const transaction = await createTransaction(
+      TransactionType.CASH_IN,
+      trnxId,
+      amount,
+      agentId,
+      recipientUser._id,
+      commission,
+      0,
+      agentId,
+      session
+    );
+    await createTransactionType(
+      TransactionType.COMMISSION,
+      trnxId,
+      commission,
+      agentId,
+      session
+    );
     await session.commitTransaction();
     session.endSession();
     return {
       message: 'Cash-in successfully',
-      transaction: senderTransaction,
+      transaction,
     };
   } catch (error) {
     await session.abortTransaction();
@@ -385,7 +408,7 @@ const cashIn = async (agentId: string, payload: Payload) => {
   }
 };
 
-//withdraw user wallet to agent
+//cashout user wallet to agent
 const cashOut = async (agentId: string, payload: Payload) => {
   const { to, amount } = payload;
   if (!to || !amount) {
@@ -481,50 +504,37 @@ const cashOut = async (agentId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const senderTransaction = await Transaction.create({
-      type: TransactionType.CASH_OUT,
-      transactionId: trnxId,
-      from: agentId,
-      to: recipientUser._id,
-      amount: amount,
-      commission,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: agentId,
-    });
-
-    const recipientTransaction = await Transaction.create({
-      type: TransactionType.WITHDRAW,
-      transactionId: trnxId,
-      from: recipientUser._id,
-      to: agentId,
-      amount: amount,
+    const transaction = await createTransaction(
+      TransactionType.CASH_OUT,
+      trnxId,
+      amount,
+      recipientUser._id,
+      agentId,
       commission,
       fee,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: recipientUser._id,
-    });
-
-    await Transaction.create({
-      type: TransactionType.COMMISSION,
-      transactionId: trnxId,
-      amount: commission,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: agentId,
-    });
-
-    await Transaction.create({
-      type: TransactionType.FEE,
-      transactionId: trnxId,
-      amount: fee,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: recipientUser,
-    });
+      agentId,
+      session
+    );
+    await createTransactionType(
+      TransactionType.COMMISSION,
+      trnxId,
+      commission,
+      agentId,
+      session
+    );
+    await createTransactionType(
+      TransactionType.FEE,
+      trnxId,
+      fee,
+      recipientUser._id,
+      session
+    );
 
     await session.commitTransaction();
     session.endSession();
     return {
-      message: 'Cash-in successfully',
-      transaction: senderTransaction,
+      message: 'Cash-out successfully',
+      transaction,
     };
   } catch (error) {
     await session.abortTransaction();
@@ -538,4 +548,5 @@ export const walletServices = {
   withdrawMoney,
   sendMoney,
   cashIn,
+  cashOut,
 };

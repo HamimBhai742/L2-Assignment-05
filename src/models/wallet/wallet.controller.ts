@@ -66,9 +66,24 @@ const cashIn = createAsyncFunction(async (req: Request, res: Response) => {
   });
 });
 
+const cashOut = createAsyncFunction(async (req: Request, res: Response) => {
+  const { userId } = req.user as JwtPayload;
+  const body = req.body;
+  const data = await walletServices.cashOut(userId, body);
+
+  //send response
+  sendResponse(res, {
+    statusCode: httpStatusCode.CREATED,
+    success: true,
+    message: data.message,
+    data: data.transaction,
+  });
+});
+
 export const walletController = {
   addMoney,
   withdrawMoney,
   sendMoney,
   cashIn,
+  cashOut
 };
