@@ -19,21 +19,41 @@ const addMoney = createAsyncFunction(async (req: Request, res: Response) => {
   });
 });
 
-const withdrawMoney = createAsyncFunction(async (req: Request, res: Response) => {
+const withdrawMoney = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const { userId } = req.user as JwtPayload;
+    const amount = Number(req.body.amount);
+    const data = await walletServices.withdrawMoney(userId, amount);
+
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.CREATED,
+      success: true,
+      message: 'Money withdraw successfully',
+      data,
+    });
+  }
+);
+
+const sendMoney = createAsyncFunction(async (req: Request, res: Response) => {
   const { userId } = req.user as JwtPayload;
-  const amount = Number(req.body.amount);
-  const data = await walletServices.withdrawMoney(userId, amount);
+  const body = req.body;
+  const data = await walletServices.sendMoney(userId, body);
 
   //send response
   sendResponse(res, {
     statusCode: httpStatusCode.CREATED,
     success: true,
-    message: 'Money withdraw successfully',
-    data,
+    message: data.message,
+    data: {
+      sender: data.senderTransaction,
+      receiver: data.receiverTransaction,
+    },
   });
 });
 
 export const walletController = {
   addMoney,
   withdrawMoney,
+  sendMoney
 };

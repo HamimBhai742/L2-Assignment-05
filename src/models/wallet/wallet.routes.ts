@@ -8,4 +8,6 @@ router.post('/add-money', checkAuth(Role.USER), walletController.addMoney);
 
 router.post('/withdraw-money', checkAuth(Role.USER), walletController.withdrawMoney);
 
+router.post('/send-money', checkAuth(Role.USER), walletController.sendMoney);
+
 export const walletRoutes = router;
