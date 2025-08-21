@@ -4,7 +4,6 @@ import { Wallet } from '../wallet/wallet.model';
 import { AgentStatus, IUser, Role, UserStatus } from './user.interface';
 import { User } from './user.model';
 import bcryptjs from 'bcrypt';
-import { Transaction } from '../transaction/transaction.model';
 
 //create new user
 const createUser = async (payload: Partial<IUser>) => {
@@ -111,15 +110,10 @@ const updateUserStatus = async (id: string, status: string) => {
   };
 };
 
-//all trabsaction
-const getAllTransaction = async () => {
-  const allTransaction = await Transaction.find();
-  return allTransaction;
-};
+
 
 export const userServices = {
   createUser,
   updateAgentStatus,
   updateUserStatus,
-  getAllTransaction
 };

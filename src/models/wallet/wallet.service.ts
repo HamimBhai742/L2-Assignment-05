@@ -246,7 +246,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const senderTransaction = await createTransaction(
+     await createTransaction(
       TransactionType.SEND_MONEY,
       trnxId,
       amount,
@@ -258,7 +258,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       session
     );
 
-    const receiverTransaction = await createTransaction(
+  await createTransaction(
       TransactionType.RECEIVE_MONEY,
       trnxId,
       amount,
@@ -393,7 +393,7 @@ const cashIn = async (agentId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const transaction = await createTransaction(
+    await createTransaction(
       TransactionType.CASH_IN,
       trnxId,
       amount,
@@ -404,6 +404,19 @@ const cashIn = async (agentId: string, payload: Payload) => {
       agentId,
       session
     );
+
+    await createTransaction(
+      TransactionType.ADD_MONEY,
+      trnxId,
+      amount,
+      agentId,
+      recipientUser._id,
+      0,
+      0,
+      recipientUser._id,
+      session
+    );
+
     await createTransactionType(
       TransactionType.COMMISSION,
       trnxId,
@@ -525,15 +538,26 @@ const cashOut = async (agentId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const transaction = await createTransaction(
+    await createTransaction(
       TransactionType.CASH_OUT,
       trnxId,
       amount,
       recipientUser._id,
       agentId,
       commission,
-      fee,
+      0,
       agentId,
+      session
+    );
+    await createTransaction(
+      TransactionType.WITHDRAW,
+      trnxId,
+      amount,
+      recipientUser._id,
+      agentId,
+      0,
+      fee,
+      recipientUser._id,
       session
     );
     await createTransactionType(
@@ -555,7 +579,7 @@ const cashOut = async (agentId: string, payload: Payload) => {
     session.endSession();
     return {
       message: 'Cash-out successfully',
-       wallet: {
+      wallet: {
         cashIn: recipientUser.phone,
         newBlance: updateReceiverAmount,
         commission,
