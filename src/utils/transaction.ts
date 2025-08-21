@@ -13,20 +13,25 @@ export const createTransaction = async (
   reciver: string,
   commission: number,
   fee: number,
-  initiatedBy:string,
-  session:ClientSession
+  initiatedBy: string,
+  session: ClientSession
 ) => {
-  const ss = await await Transaction.create([{
-    type,
-    transactionId: trnxId,
-    from: sender,
-    to: reciver,
-    amount: amount,
-    commission,
-    fee,
-    status: TransactionStatus.COMPLETED,
-    initiatedBy,
-  }],{session});
+  const ss = await await Transaction.create(
+    [
+      {
+        type,
+        transactionId: trnxId,
+        from: sender,
+        to: reciver,
+        amount: amount,
+        commission,
+        fee,
+        status: TransactionStatus.COMPLETED,
+        initiatedBy,
+      },
+    ],
+    { session }
+  );
   return ss;
 };
 
@@ -35,14 +40,20 @@ export const createTransactionType = async (
   trnxId: string,
   amount: number,
   initiatedBy: string,
-  session:ClientSession
+  session: ClientSession
 ) => {
-  const ss = await await Transaction.create([{
-    type,
-    transactionId: trnxId,
-    amount,
-    status: TransactionStatus.COMPLETED,
-    initiatedBy
-  }],{session});
+  const ss = await await Transaction.create(
+    [
+      {
+        type,
+        transactionId: trnxId,
+        amount,
+        status: TransactionStatus.COMPLETED,
+        initiatedBy,
+      },
+    ],
+    { session }
+  );
   return ss;
 };
+

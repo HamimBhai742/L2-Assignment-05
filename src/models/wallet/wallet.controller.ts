@@ -45,10 +45,7 @@ const sendMoney = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.CREATED,
     success: true,
     message: data.message,
-    data: {
-      sender: data.senderTransaction,
-      receiver: data.receiverTransaction,
-    },
+    data: data.wallet,
   });
 });
 
@@ -62,7 +59,7 @@ const cashIn = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.CREATED,
     success: true,
     message: data.message,
-    data: data.transaction,
+    data: data.wallet,
   });
 });
 
@@ -76,14 +73,15 @@ const cashOut = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.CREATED,
     success: true,
     message: data.message,
-    data: data.transaction,
+    data: data.wallet
   });
 });
+
 
 export const walletController = {
   addMoney,
   withdrawMoney,
   sendMoney,
   cashIn,
-  cashOut
+  cashOut,
 };

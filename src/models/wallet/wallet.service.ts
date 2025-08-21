@@ -49,14 +49,19 @@ const addMoney = async (userId: string, amount: number) => {
       { new: true, runValidators: true, session }
     );
 
-    const transaction = await Transaction.create({
-      type: TransactionType.ADD_MONEY,
-      transactionId: trnxId,
-      to: userId,
-      amount: amount,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: userId,
-    });
+    const transaction = await Transaction.create(
+      [
+        {
+          type: TransactionType.ADD_MONEY,
+          transactionId: trnxId,
+          to: userId,
+          amount: amount,
+          status: TransactionStatus.COMPLETED,
+          initiatedBy: userId,
+        },
+      ],
+      { session }
+    );
 
     await session.commitTransaction();
     return {
@@ -115,21 +120,26 @@ const withdrawMoney = async (userId: string, amount: number) => {
       { new: true, runValidators: true, session }
     );
 
-    const transaction = await Transaction.create({
-      type: TransactionType.WITHDRAW,
-      transactionId: trnxId,
-      from: userId,
-      amount: amount,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: userId,
-    });
+    const transaction = await Transaction.create(
+      [
+        {
+          type: TransactionType.WITHDRAW,
+          transactionId: trnxId,
+          from: userId,
+          amount: amount,
+          status: TransactionStatus.COMPLETED,
+          initiatedBy: userId,
+        },
+      ],
+      { session }
+    );
 
     await session.commitTransaction();
     session.endSession();
     return {
       message: 'Money withdraw successfully',
       wallet: {
-        user: wallet.user,
+        receiver: wallet.user,
         balance: updateAmount,
         status: wallet.status,
       },
@@ -236,33 +246,50 @@ const sendMoney = async (userId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const senderTransaction = await Transaction.create({
-      type: TransactionType.SEND_MONEY,
-      transactionId: trnxId,
-      from: userId,
-      to: receiverUser._id,
-      amount: amount,
+    const senderTransaction = await createTransaction(
+      TransactionType.SEND_MONEY,
+      trnxId,
+      amount,
+      userId,
+      receiverUser._id,
+      0,
       fee,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: userId,
-    });
+      userId,
+      session
+    );
 
-    const receiverTransaction = await Transaction.create({
-      type: TransactionType.RECEIVE_MONEY,
-      transactionId: trnxId,
-      from: userId,
-      to: receiverUser._id,
-      amount: amount,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: receiverUser._id,
-    });
+    const receiverTransaction = await createTransaction(
+      TransactionType.RECEIVE_MONEY,
+      trnxId,
+      amount,
+      userId,
+      receiverUser._id,
+      0,
+      0,
+      receiverUser._id,
+      session
+    );
+
+    if (fee > 0) {
+      await createTransactionType(
+        TransactionType.FEE,
+        trnxId,
+        fee,
+        userId,
+        session
+      );
+    }
 
     await session.commitTransaction();
     session.endSession();
     return {
       message: 'Send money successfully',
-      senderTransaction,
-      receiverTransaction,
+      wallet: {
+        receiver: to,
+        availableBalance: updateSenderAmount,
+        trnxId,
+        status: senderWallet.status,
+      },
     };
   } catch (error) {
     await session.abortTransaction();
@@ -366,17 +393,6 @@ const cashIn = async (agentId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    const senderTransaction = await Transaction.create({
-      type: TransactionType.CASH_IN,
-      transactionId: trnxId,
-      from: agentId,
-      to: recipientUser._id,
-      amount: amount,
-      commission,
-      status: TransactionStatus.COMPLETED,
-      initiatedBy: agentId,
-    });
-
     const transaction = await createTransaction(
       TransactionType.CASH_IN,
       trnxId,
@@ -399,7 +415,12 @@ const cashIn = async (agentId: string, payload: Payload) => {
     session.endSession();
     return {
       message: 'Cash-in successfully',
-      transaction,
+      wallet: {
+        cashIn: recipientUser.phone,
+        availableBlance: updateSenderAmount,
+        commission,
+        walletStatus: senderWallet.status,
+      },
     };
   } catch (error) {
     await session.abortTransaction();
@@ -534,7 +555,12 @@ const cashOut = async (agentId: string, payload: Payload) => {
     session.endSession();
     return {
       message: 'Cash-out successfully',
-      transaction,
+       wallet: {
+        cashIn: recipientUser.phone,
+        newBlance: updateReceiverAmount,
+        commission,
+        walletStatus: receiverWallet.status,
+      },
     };
   } catch (error) {
     await session.abortTransaction();
