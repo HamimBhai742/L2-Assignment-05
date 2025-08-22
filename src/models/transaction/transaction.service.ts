@@ -3,7 +3,7 @@ import { Transaction } from './transaction.model';
 
 //all transaction
 const getAllTransaction = async () => {
-  const allTransaction = await Transaction.find();
+  const allTransaction = await Transaction.find().populate('to',"name phone role status").populate('from','name phone role status');
   return allTransaction;
 };
 

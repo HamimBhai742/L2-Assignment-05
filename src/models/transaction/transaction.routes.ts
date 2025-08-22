@@ -17,7 +17,7 @@ router.get(
 );
 
 router.get(
-  '/commission/me',
+  '/agent-commission/me',
   checkAuth(Role.AGENT),
   transactionController.getCommissionTransactoins
 );

@@ -4,6 +4,7 @@ import { Wallet } from '../wallet/wallet.model';
 import { AgentStatus, IUser, Role, UserStatus } from './user.interface';
 import { User } from './user.model';
 import bcryptjs from 'bcrypt';
+import { WalletStatus } from '../wallet/wallet.interface';
 
 //create new user
 const createUser = async (payload: Partial<IUser>) => {
@@ -39,6 +40,12 @@ const createUser = async (payload: Partial<IUser>) => {
     user,
     message: `${role ? role : 'User'} created successfully`,
   };
+};
+
+//get all users by admin
+const getAllAgents = async () => {
+  const allAgents = await User.find({ role: Role.AGENT });
+  return allAgents;
 };
 
 //update agent status
@@ -77,6 +84,12 @@ const updateAgentStatus = async (id: string, status: string) => {
   };
 };
 
+//get all users by admin
+const getAllUsers = async () => {
+  const allUsers = await User.find({ role: Role.USER });
+  return allUsers;
+};
+
 //update user status
 const updateUserStatus = async (id: string, status: string) => {
   const userUpSatus = status.toLowerCase();
@@ -110,10 +123,56 @@ const updateUserStatus = async (id: string, status: string) => {
   };
 };
 
+//admin gel all wallet
+const getAllWallets = async () => {
+  const allWallets = await Wallet.find().populate(
+    'user',
+    'name phone role status'
+  );
+  return allWallets;
+};
 
+//admin update wallet status
+const updateWalletStatus = async (id: string, status: string) => {
+  const walletUpSatus = status.toLowerCase();
+  const isExistWallet = await Wallet.findOne({ user: id });
+  if (!isExistWallet) {
+    throw new AppError(
+      'This ID does not belong to the wallet.',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+  const walletstatus: string[] = Object.values(WalletStatus);
+  if (!walletstatus.includes(walletUpSatus)) {
+    throw new AppError(
+      'Please provide valid status.',
+      httpStatusCode.BAD_REQUEST
+    );
+  }
+  if (isExistWallet.status === walletUpSatus) {
+    throw new AppError(
+      `Wallet already ${walletUpSatus}`,
+      httpStatusCode.FORBIDDEN
+    );
+  }
+  await Wallet.findByIdAndUpdate(id, {
+    status: walletUpSatus,
+  });
+  return {
+    success: true,
+    message: `Wallet status ${walletUpSatus} successfully`,
+    data: {
+      walletStatus: walletUpSatus,
+    },
+  };
+};
 
 export const userServices = {
   createUser,
   updateAgentStatus,
   updateUserStatus,
+  getAllUsers,
+  getAllAgents,
+  getAllWallets,
+  updateWalletStatus,
 };
