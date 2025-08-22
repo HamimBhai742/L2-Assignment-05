@@ -11,6 +11,11 @@ router.get('/all-agents', checkAuth(Role.ADMIN), userController.getAllAgents);
 
 router.get('/all-wallets', checkAuth(Role.ADMIN), userController.getAllWallets);
 
+router.patch(
+  '/wallet-status/:id',
+  checkAuth(Role.ADMIN),
+  userController.updateWalletStatus
+);
 
 router.patch(
   '/agent-status/:id',

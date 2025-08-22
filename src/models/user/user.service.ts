@@ -135,13 +135,15 @@ const getAllWallets = async () => {
 //admin update wallet status
 const updateWalletStatus = async (id: string, status: string) => {
   const walletUpSatus = status.toLowerCase();
-  const isExistWallet = await Wallet.findOne({ user: id });
+  const isExistWallet = await Wallet.findOne({ user: id }).populate('user');
+  console.log(isExistWallet);
   if (!isExistWallet) {
     throw new AppError(
       'This ID does not belong to the wallet.',
       httpStatusCode.BAD_REQUEST
     );
   }
+
   const walletstatus: string[] = Object.values(WalletStatus);
   if (!walletstatus.includes(walletUpSatus)) {
     throw new AppError(
@@ -155,7 +157,7 @@ const updateWalletStatus = async (id: string, status: string) => {
       httpStatusCode.FORBIDDEN
     );
   }
-  await Wallet.findByIdAndUpdate(id, {
+  await Wallet.findOneAndUpdate({user:id}, {
     status: walletUpSatus,
   });
   return {
