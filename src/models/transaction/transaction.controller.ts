@@ -7,7 +7,10 @@ import { JwtPayload } from 'jsonwebtoken';
 
 const getAllTransactin = createAsyncFunction(
   async (req: Request, res: Response) => {
-    const data = await transactionServices.getAllTransaction();
+    const query = req.query;
+    const data = await transactionServices.getAllTransaction(
+      query as Record<string, string>
+    );
     //send response
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
@@ -21,16 +24,18 @@ const getAllTransactin = createAsyncFunction(
 const getMyTransactoins = createAsyncFunction(
   async (req: Request, res: Response) => {
     const { userId } = req.user as JwtPayload;
-    const data = await transactionServices.getMyTransactoins(userId);
+    const query = req.query;
+    const data = await transactionServices.getMyTransactoins(
+      userId,
+      query as Record<string, string>
+    );
     //send response
     sendResponse(res, {
       success: true,
       statusCode: httpStatusCode.OK,
-      metadata: {
-        total: data.total,
-      },
       message: 'My transaction retrived successfully',
       data: data.myTnx,
+      metadata: data.metaData,
     });
   }
 );
@@ -38,16 +43,18 @@ const getMyTransactoins = createAsyncFunction(
 const getCommissionTransactoins = createAsyncFunction(
   async (req: Request, res: Response) => {
     const { userId } = req.user as JwtPayload;
-    const data = await transactionServices.getCommissionTransactoins(userId);
+    const query = req.query;
+    const data = await transactionServices.getCommissionTransactoins(
+      userId,
+      query as Record<string, string>
+    );
     //send response
     sendResponse(res, {
       success: true,
       statusCode: httpStatusCode.OK,
-      metadata: {
-        total: data.total,
-      },
       message: 'My transaction retrived successfully',
       data: data.commissionTnx,
+      metadata: data.metaData,
     });
   }
 );
@@ -55,5 +62,5 @@ const getCommissionTransactoins = createAsyncFunction(
 export const transactionController = {
   getAllTransactin,
   getMyTransactoins,
-  getCommissionTransactoins
+  getCommissionTransactoins,
 };
