@@ -246,7 +246,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-     await createTransaction(
+    await createTransaction(
       TransactionType.SEND_MONEY,
       trnxId,
       amount,
@@ -258,7 +258,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       session
     );
 
-  await createTransaction(
+    await createTransaction(
       TransactionType.RECEIVE_MONEY,
       trnxId,
       amount,
@@ -397,8 +397,8 @@ const cashIn = async (agentId: string, payload: Payload) => {
       TransactionType.CASH_IN,
       trnxId,
       amount,
-      agentId,
       recipientUser._id,
+      agentId,
       commission,
       0,
       agentId,
@@ -542,8 +542,8 @@ const cashOut = async (agentId: string, payload: Payload) => {
       TransactionType.CASH_OUT,
       trnxId,
       amount,
-      recipientUser._id,
       agentId,
+      recipientUser._id,
       commission,
       0,
       agentId,
