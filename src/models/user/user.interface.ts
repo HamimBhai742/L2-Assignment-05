@@ -9,18 +9,12 @@ export enum Role {
   AGENT = 'agent',
   ADMIN = 'admin',
 }
-
-export enum UserStatus {
-  ACTIVE = 'active',
-  BLOCKED = 'blocked',
-}
-
 export interface IUser {
   _id?: string;
   name: string;
   phone: string;
   password: string;
   role?: Role;
-  status: UserStatus;
+  isActive?: boolean;
   agentStatus?: AgentStatus;
 }

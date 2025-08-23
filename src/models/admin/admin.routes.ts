@@ -18,25 +18,25 @@ router.get(
 );
 
 router.patch(
-  '/agent/approved/:id',
+  '/agents-approved/:id',
   checkAuth(Role.ADMIN),
   adminController.approvedAgent
 );
 
 router.patch(
-  '/agent/suspend/:id',
+  '/agents-suspend/:id',
   checkAuth(Role.ADMIN),
   adminController.suspendAgent
 );
 
 router.patch(
-  '/wallet/active/:id',
+  '/wallets/active/:id',
   checkAuth(Role.ADMIN),
   adminController.activeWallet
 );
 
 router.patch(
-  '/wallet/blocked/:id',
+  '/wallets/blocked/:id',
   checkAuth(Role.ADMIN),
   adminController.blockedWallet
 );

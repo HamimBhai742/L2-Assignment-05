@@ -45,7 +45,7 @@ export class QueryBuilder<T> {
   }
 
   select(): this {
-    const fildesFilter = this.query.fildes?.split(',').join(' ');
+    const fildesFilter = this.query.fields?.split(',').join(' ');
     this.modelQuery = this.modelQuery.select(fildesFilter);
     return this;
   }

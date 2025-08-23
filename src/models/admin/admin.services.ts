@@ -1,9 +1,8 @@
 import httpStatusCode from 'http-status-codes';
 import { User } from '../user/user.model';
-import { AgentStatus, Role, UserStatus } from '../user/user.interface';
+import {  Role } from '../user/user.interface';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';
-import { WalletStatus } from '../wallet/wallet.interface';
 import { env } from '../../config/env';
 import { QueryBuilder } from '../../utils/query.builder';
 import { Transaction } from '../transaction/transaction.model';

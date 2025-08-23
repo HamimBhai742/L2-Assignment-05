@@ -4,7 +4,7 @@ import httpStatusCode from 'http-status-codes';
 import { verifyJwtToken } from '../utils/token.create.verfy.fn';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/user/user.model';
-import { AgentStatus, UserStatus } from '../models/user/user.interface';
+import { AgentStatus  } from '../models/user/user.interface';
 import { Wallet } from '../models/wallet/wallet.model';
 import { WalletStatus } from '../models/wallet/wallet.interface';
 import { env } from '../config/env';
@@ -25,13 +25,7 @@ export const checkAuth =
       if (!isExist) {
         throw new AppError('User not found', httpStatusCode.NOT_FOUND);
       }
-
-      if (isExist?.status === UserStatus.BLOCKED) {
-        throw new AppError(
-          `User is ${isExist.status}`,
-          httpStatusCode.FORBIDDEN
-        );
-      } else if (
+      if (
         isExist?.agentStatus === AgentStatus.PENDING ||
         isExist?.agentStatus === AgentStatus.SUSPEND
       ) {

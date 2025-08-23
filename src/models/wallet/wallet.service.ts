@@ -9,12 +9,11 @@ import { Wallet } from './wallet.model';
 import { AppError } from '../../error/coustom.error.handel';
 import { env } from '../../config/env';
 import { User } from '../user/user.model';
-import { Role, UserStatus } from '../user/user.interface';
+import { Role } from '../user/user.interface';
 import {
   createTransaction,
   createTransactionType,
 } from '../../utils/transaction';
-import { useId } from 'react';
 interface Payload {
   to: string;
   amount: number;
@@ -31,19 +30,21 @@ const addMoney = async (userId: string, amount: number) => {
 
   try {
     const wallet = await Wallet.findOne({ user: userId });
-    if (!wallet) {
-      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
-    }
-    if (wallet.status === WalletStatus.BLOCKED) {
-      throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
-    }
+
+    // if (!wallet) {
+    //   throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    // }
+    // if (wallet.status === WalletStatus.BLOCKED) {
+    //   throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
+    // }
+
     if (amount <= 0) {
       throw new AppError(
         'Amount must be greater than zero',
         httpStatusCode.BAD_REQUEST
       );
     }
-    const updateAmount = Number(wallet.balance) + Number(amount);
+    const updateAmount = Number(wallet!.balance) + Number(amount);
     await Wallet.findOneAndUpdate(
       { user: userId },
       { balance: updateAmount },
@@ -68,9 +69,9 @@ const addMoney = async (userId: string, amount: number) => {
     return {
       message: 'Money added successfully',
       wallet: {
-        user: wallet.user,
+        user: wallet!.user,
         balance: updateAmount,
-        status: wallet.status,
+        status: wallet!.status,
       },
       transaction,
     };
@@ -83,7 +84,6 @@ const addMoney = async (userId: string, amount: number) => {
 
 //withdraw money to user wallet
 const withdrawMoney = async (userId: string, amount: number) => {
-  console.log(userId, amount);
   const session = await Wallet.startSession();
   session.startTransaction();
 
@@ -94,13 +94,13 @@ const withdrawMoney = async (userId: string, amount: number) => {
   try {
     const wallet = await Wallet.findOne({ user: userId });
 
-    if (!wallet) {
-      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
-    }
+    // if (!wallet) {
+    //   throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    // }
 
-    if (wallet.status === WalletStatus.BLOCKED) {
-      throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
-    }
+    // if (wallet.status === WalletStatus.BLOCKED) {
+    //   throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
+    // }
 
     if (amount <= 0) {
       throw new AppError(
@@ -109,7 +109,7 @@ const withdrawMoney = async (userId: string, amount: number) => {
       );
     }
 
-    const updateAmount = Number(wallet.balance) - Number(amount);
+    const updateAmount = Number(wallet!.balance) - Number(amount);
 
     if (updateAmount < 0) {
       throw new AppError('Insufficient balance', httpStatusCode.BAD_REQUEST);
@@ -140,9 +140,9 @@ const withdrawMoney = async (userId: string, amount: number) => {
     return {
       message: 'Money withdraw successfully',
       wallet: {
-        receiver: wallet.user,
+        receiver: wallet!.user,
         balance: updateAmount,
-        status: wallet.status,
+        status: wallet!.status,
       },
       transaction,
     };
@@ -186,10 +186,6 @@ const sendMoney = async (userId: string, payload: Payload) => {
       );
     }
 
-    if (receiverUser.status === UserStatus.BLOCKED) {
-      throw new AppError('Receiver is blocked', httpStatusCode.FORBIDDEN);
-    }
-
     if (receiverUser.role !== Role.USER) {
       throw new AppError('Receiver is not a user', httpStatusCode.FORBIDDEN);
     }
@@ -197,17 +193,17 @@ const sendMoney = async (userId: string, payload: Payload) => {
     const senderWallet = await Wallet.findOne({ user: userId });
     const receiverWallet = await Wallet.findOne({ user: receiverUser._id });
 
-    if (!senderWallet) {
-      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
-    }
+    // if (!senderWallet) {
+    //   throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    // }
 
     if (!receiverWallet) {
       throw new AppError('Receiver wallet not found', httpStatusCode.NOT_FOUND);
     }
 
-    if (senderWallet.status === WalletStatus.BLOCKED) {
-      throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
-    }
+    // if (senderWallet.status === WalletStatus.BLOCKED) {
+    //   throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
+    // }
 
     if (receiverWallet.status === WalletStatus.BLOCKED) {
       throw new AppError(
@@ -227,7 +223,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       fee = 5;
     }
     const updateSenderAmount =
-      Number(senderWallet.balance) - Number(amount) - fee;
+      Number(senderWallet!.balance) - Number(amount) - fee;
     const updateReceiverAmount =
       Number(receiverWallet.balance) + Number(amount);
 
@@ -289,7 +285,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
         receiver: to,
         availableBalance: updateSenderAmount,
         trnxId,
-        status: senderWallet.status,
+        status: senderWallet!.status,
       },
     };
   } catch (error) {
@@ -332,10 +328,6 @@ const cashIn = async (agentId: string, payload: Payload) => {
       );
     }
 
-    if (recipientUser.status === UserStatus.BLOCKED) {
-      throw new AppError('Recipient is blocked', httpStatusCode.FORBIDDEN);
-    }
-
     if (recipientUser.role !== Role.USER) {
       throw new AppError('Recipient is not a user', httpStatusCode.FORBIDDEN);
     }
@@ -343,9 +335,9 @@ const cashIn = async (agentId: string, payload: Payload) => {
     const senderWallet = await Wallet.findOne({ user: agentId });
     const recipientWallet = await Wallet.findOne({ user: recipientUser._id });
 
-    if (!senderWallet) {
-      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
-    }
+    // if (!senderWallet) {
+    //   throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    // }
 
     if (!recipientWallet) {
       throw new AppError(
@@ -354,9 +346,9 @@ const cashIn = async (agentId: string, payload: Payload) => {
       );
     }
 
-    if (senderWallet.status === WalletStatus.BLOCKED) {
-      throw new AppError('Sender wallet is blocked', httpStatusCode.FORBIDDEN);
-    }
+    // if (senderWallet.status === WalletStatus.BLOCKED) {
+    //   throw new AppError('Sender wallet is blocked', httpStatusCode.FORBIDDEN);
+    // }
 
     if (recipientWallet.status === WalletStatus.BLOCKED) {
       throw new AppError(
@@ -373,7 +365,7 @@ const cashIn = async (agentId: string, payload: Payload) => {
     }
     const commission = Number(amount / 1000) * 4.5;
     const updateSenderAmount =
-      Number((senderWallet.balance as number) + commission) - Number(amount);
+      Number((senderWallet!.balance as number) + commission) - Number(amount);
 
     const updateRecipientAmount =
       Number(recipientWallet.balance) + Number(amount);
@@ -433,7 +425,7 @@ const cashIn = async (agentId: string, payload: Payload) => {
         cashIn: recipientUser.phone,
         availableBlance: updateSenderAmount,
         commission,
-        walletStatus: senderWallet.status,
+        walletStatus: senderWallet!.status,
       },
     };
   } catch (error) {
@@ -476,10 +468,6 @@ const cashOut = async (agentId: string, payload: Payload) => {
       );
     }
 
-    if (recipientUser.status === UserStatus.BLOCKED) {
-      throw new AppError('Recipient is blocked', httpStatusCode.FORBIDDEN);
-    }
-
     if (recipientUser.role !== Role.USER) {
       throw new AppError('Recipient is not a user', httpStatusCode.FORBIDDEN);
     }
@@ -487,9 +475,9 @@ const cashOut = async (agentId: string, payload: Payload) => {
     const receiverWallet = await Wallet.findOne({ user: agentId });
     const recipientWallet = await Wallet.findOne({ user: recipientUser._id });
 
-    if (!receiverWallet) {
-      throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
-    }
+    // if (!receiverWallet) {
+    //   throw new AppError('Wallet not found', httpStatusCode.NOT_FOUND);
+    // }
 
     if (!recipientWallet) {
       throw new AppError(
@@ -498,9 +486,9 @@ const cashOut = async (agentId: string, payload: Payload) => {
       );
     }
 
-    if (receiverWallet.status === WalletStatus.BLOCKED) {
-      throw new AppError('Sender wallet is blocked', httpStatusCode.FORBIDDEN);
-    }
+    // if (receiverWallet.status === WalletStatus.BLOCKED) {
+    //   throw new AppError('Receiver wallet is blocked', httpStatusCode.FORBIDDEN);
+    // }
 
     if (recipientWallet.status === WalletStatus.BLOCKED) {
       throw new AppError(
@@ -517,7 +505,7 @@ const cashOut = async (agentId: string, payload: Payload) => {
     }
     const commission = Number(amount / 1000) * 14.0;
     const updateReceiverAmount =
-      Number((receiverWallet.balance as number) + commission) + Number(amount);
+      Number((receiverWallet!.balance as number) + commission) + Number(amount);
 
     const fee = Number(amount / 1000) * 18.5;
     const updateRecipientAmount =
@@ -584,7 +572,7 @@ const cashOut = async (agentId: string, payload: Payload) => {
         cashIn: recipientUser.phone,
         newBlance: updateReceiverAmount,
         commission,
-        walletStatus: receiverWallet.status,
+        walletStatus: receiverWallet!.status,
       },
     };
   } catch (error) {
