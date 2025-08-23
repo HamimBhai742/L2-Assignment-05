@@ -4,11 +4,7 @@ import { checkAuth } from '../../middlewares/jwt.verify';
 import { transactionController } from './transaction.controller';
 const router = Router();
 
-router.get(
-  '/',
-  checkAuth(Role.ADMIN),
-  transactionController.getAllTransactin
-);
+
 
 router.get(
   '/me',
@@ -17,7 +13,7 @@ router.get(
 );
 
 router.get(
-  '/agent-commission/me',
+  '/commission',
   checkAuth(Role.AGENT),
   transactionController.getCommissionTransactoins
 );

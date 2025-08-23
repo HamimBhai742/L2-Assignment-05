@@ -5,21 +5,7 @@ import { sendResponse } from '../../utils/send.response';
 import { transactionServices } from './transaction.service';
 import { JwtPayload } from 'jsonwebtoken';
 
-const getAllTransactin = createAsyncFunction(
-  async (req: Request, res: Response) => {
-    const query = req.query;
-    const data = await transactionServices.getAllTransaction(
-      query as Record<string, string>
-    );
-    //send response
-    sendResponse(res, {
-      statusCode: httpStatusCode.OK,
-      success: true,
-      message: 'All transaction retrived successfully',
-      data,
-    });
-  }
-);
+
 
 const getMyTransactoins = createAsyncFunction(
   async (req: Request, res: Response) => {
@@ -60,7 +46,6 @@ const getCommissionTransactoins = createAsyncFunction(
 );
 
 export const transactionController = {
-  getAllTransactin,
   getMyTransactoins,
   getCommissionTransactoins,
 };

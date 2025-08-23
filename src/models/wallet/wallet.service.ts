@@ -14,6 +14,7 @@ import {
   createTransaction,
   createTransactionType,
 } from '../../utils/transaction';
+import { useId } from 'react';
 interface Payload {
   to: string;
   amount: number;
@@ -593,10 +594,18 @@ const cashOut = async (agentId: string, payload: Payload) => {
   }
 };
 
+//view own wallet user
+
+const viewMyWallet = async (userId: string) => {
+  const myWallet = await Wallet.findOne({ user: userId });
+  return myWallet;
+};
+
 export const walletServices = {
   addMoney,
   withdrawMoney,
   sendMoney,
   cashIn,
   cashOut,
+  viewMyWallet,
 };

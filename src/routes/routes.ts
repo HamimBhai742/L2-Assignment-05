@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { userRoutes } from '../models/user/user.routes';
 import { authRoutes } from '../models/auth/auth.routes';
 import { walletRoutes } from '../models/wallet/wallet.routes';
-import { adminRoutes } from '../models/user/admin.routes';
+import { adminRoutes } from '../models/admin/admin.routes';
 import { transactionRoutes } from '../models/transaction/transaction.routes';
 
 export const router = Router();
@@ -17,7 +17,7 @@ const routes = [
     route: authRoutes,
   },
   {
-    path: '/wallets',
+    path: '/wallet',
     route: walletRoutes,
   },
   {

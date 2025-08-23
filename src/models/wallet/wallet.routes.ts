@@ -18,5 +18,6 @@ router.post('/cash-in', checkAuth(Role.AGENT), walletController.cashIn);
 
 router.post('/cash-out', checkAuth(Role.AGENT), walletController.cashOut);
 
+router.get('/me', checkAuth(Role.USER), walletController.viewMyWallet);
 
 export const walletRoutes = router;

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { app } from './app';
 import { env } from './config/env';
 
-const PORT = process.env.SERVER_PORT || 3000;
+const PORT = env.PORT;
 let server: Server;
 
 const startServer = async () => {
