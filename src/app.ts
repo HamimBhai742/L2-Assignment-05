@@ -36,7 +36,7 @@ app.use('/api/a5', router);
 
 //running the server
 app.get('/', (req: Request, res: Response) => {
-  res.send('Digital wallet api server is running!');
+  res.send('Digital wallet api system server is running!');
 });
 
 //global error handler
