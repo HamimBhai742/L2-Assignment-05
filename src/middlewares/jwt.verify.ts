@@ -30,7 +30,7 @@ export const checkAuth =
         isExist?.agentStatus === AgentStatus.SUSPEND
       ) {
         throw new AppError(
-          `Agent is ${isExist?.agentStatus}`,
+          `Agent is ${isExist?.agentStatus}.So you can't make any transactions.`,
           httpStatusCode.FORBIDDEN
         );
       }
@@ -41,7 +41,7 @@ export const checkAuth =
       }
 
       if (isExistWallet.status === WalletStatus.BLOCKED) {
-        throw new AppError('Wallet is blocked', httpStatusCode.FORBIDDEN);
+        throw new AppError("Wallet is blocked.So you can't make any transactions.", httpStatusCode.FORBIDDEN);
       }
 
       if (!authRole.includes(decoded.role)) {

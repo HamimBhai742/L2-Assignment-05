@@ -6,6 +6,7 @@ import passport from 'passport';
 import { AppError } from '../../error/coustom.error.handel';
 import { createUserToken } from '../../utils/jwt.token';
 import { setCookies } from '../../utils/set.cookies';
+
 const loggedInUser = createAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local', async (err: any, user: any, info: any) => {
@@ -21,7 +22,7 @@ const loggedInUser = createAsyncFunction(
 
       const userToken = createUserToken(user);
       setCookies(res, userToken);
-      
+
       const userData = { ...user.toObject() };
       delete userData.password; // Remove password from user data
       //send response
