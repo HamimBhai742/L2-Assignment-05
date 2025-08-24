@@ -1,5 +1,5 @@
 import { Query } from 'mongoose';
-import { excludeFildes, searcFildes } from './constain';
+import { excludeFildes } from './constain';
 
 export class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
@@ -19,10 +19,10 @@ export class QueryBuilder<T> {
     return this;
   }
 
-  search(): this {
+  search(searchFields:string[]): this {
     const searchQuery = this.query.search || '';
     const search = {
-      $or: searcFildes.map((sf) => ({
+      $or: searchFields.map((sf) => ({
         [sf]: { $regex: searchQuery, $options: 'i' },
       })),
     };

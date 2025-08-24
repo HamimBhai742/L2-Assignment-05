@@ -5,32 +5,41 @@ import { adminServices } from './admin.services';
 import { sendResponse } from '../../utils/send.response';
 
 const getAllUsers = createAsyncFunction(async (req: Request, res: Response) => {
-  const data = await adminServices.getAllUsers();
+  const query = req.query;
+  const data = await adminServices.getAllUsers(query as Record<string, string>);
   //send response
   sendResponse(res, {
     statusCode: httpStatusCode.OK,
     success: true,
-    message: 'Retrieved all agents successfully',
-    data,
+    message: 'Retrieved all users successfully',
+    data: data.allUsers,
+    metadata: data.metaData,
   });
 });
 
 const getAllAgents = createAsyncFunction(
   async (req: Request, res: Response) => {
-    const data = await adminServices.getAllAgents();
+    const query = req.query;
+    const data = await adminServices.getAllAgents(
+      query as Record<string, string>
+    );
     //send response
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
       success: true,
-      message: 'Retrieved all users successfully',
-      data,
+      message: 'Retrieved all agents successfully',
+      data: data.allAgents,
+      metadata: data.metaData,
     });
   }
 );
 
 const getAllWallets = createAsyncFunction(
   async (req: Request, res: Response) => {
-    const data = await adminServices.getAllWallets();
+    const query = req.query;
+    const data = await adminServices.getAllWallets(
+      query as Record<string, string>
+    );
     //send response
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
@@ -121,5 +130,5 @@ export const adminController = {
   getAllAgents,
   getAllWallets,
   blockedWallet,
-  getAllTransaction
+  getAllTransaction,
 };

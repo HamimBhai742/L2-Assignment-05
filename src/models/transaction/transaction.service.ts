@@ -1,3 +1,4 @@
+import { transactionSearchFields } from '../../utils/constain';
 import { QueryBuilder } from '../../utils/query.builder';
 import { TransactionType } from './transaction.interface';
 import { Transaction } from './transaction.model';
@@ -10,7 +11,7 @@ const getMyTransactoins = async (id: string, query: Record<string, string>) => {
   );
   const myTnx = await queryBuilder
     .filter()
-    .search()
+    .search(transactionSearchFields)
     .pagination()
     .sort()
     .select()
@@ -38,7 +39,7 @@ const getCommissionTransactoins = async (
 
   const commissionTnx = await queryBuilder
     .filter()
-    .search()
+    .search(transactionSearchFields)
     .pagination()
     .sort()
     .select()

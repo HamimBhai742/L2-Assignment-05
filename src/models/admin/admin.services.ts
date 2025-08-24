@@ -1,31 +1,67 @@
 import httpStatusCode from 'http-status-codes';
 import { User } from '../user/user.model';
-import {  Role } from '../user/user.interface';
+import { Role } from '../user/user.interface';
 import { AppError } from '../../error/coustom.error.handel';
 import { Wallet } from '../wallet/wallet.model';
 import { env } from '../../config/env';
 import { QueryBuilder } from '../../utils/query.builder';
 import { Transaction } from '../transaction/transaction.model';
+import {  transactionSearchFields, userSearchFields } from '../../utils/constain';
 
 //get all users by admin
-const getAllUsers = async () => {
-  const allUsers = await User.find({ role: Role.USER });
-  return allUsers;
+const getAllUsers = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find({ role: Role.USER }), query);
+  const allUsers = await queryBuilder
+    .filter()
+    .search(userSearchFields)
+    .pagination()
+    .sort()
+    .select()
+    .build();
+  const countDocuments = await User.countDocuments({ role: Role.USER });
+  const metaData = await queryBuilder.getMeta(countDocuments);
+  return {
+    allUsers,
+    metaData,
+  };
 };
 
 //get all users by admin
-const getAllAgents = async () => {
-  const allAgents = await User.find({ role: Role.AGENT });
-  return allAgents;
+const getAllAgents = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find({ role: Role.AGENT }), query);
+  const allAgents = await queryBuilder
+    .filter()
+    .search(userSearchFields)
+    .pagination()
+    .sort()
+    .select()
+    .build();
+  const countDocuments = await User.countDocuments({ role: Role.AGENT });
+  const metaData = await queryBuilder.getMeta(countDocuments);
+  return {
+    allAgents,
+    metaData,
+  };
 };
 
 //admin gel all wallet
-const getAllWallets = async () => {
-  const allWallets = await Wallet.find().populate(
-    'user',
-    'name phone role status'
+const getAllWallets = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(
+    Wallet.find().populate('user', 'name phone role status'),
+    query
   );
-  return allWallets;
+  const allWallets = await queryBuilder
+    .filter()
+    .pagination()
+    .sort()
+    .select()
+    .build();
+  const countDocuments = await Wallet.countDocuments();
+  const metaData = await queryBuilder.getMeta(countDocuments);
+  return {
+    allWallets,
+    metaData,
+  };
 };
 
 //all transaction
@@ -38,7 +74,7 @@ const getAllTransaction = async (query: Record<string, string>) => {
   );
   const allTransaction = await queryBuilder
     .filter()
-    .search()
+    .search(transactionSearchFields)
     .pagination()
     .sort()
     .select()
@@ -113,7 +149,7 @@ const blockedWallet = async (id: string) => {
   );
   return {
     success: true,
-    message: `Wallet  ${env.WALLET_ACTIVE} successfully`,
+    message: `Wallet  ${env.WALLET_BLOCKED} successfully`,
     data: {
       walletStatus: env.WALLET_BLOCKED,
     },
@@ -130,14 +166,14 @@ const approvedAgent = async (id: string) => {
     );
   }
   if ((isExistAgent.agentStatus as string) === env.AGENT_APPROVED) {
-    throw new AppError(`Agent already approved`, httpStatusCode.FORBIDDEN);
+    throw new AppError(`Agent already ${env.AGENT_APPROVED}`, httpStatusCode.FORBIDDEN);
   }
   await User.findByIdAndUpdate(id, {
     agentStatus: env.AGENT_APPROVED,
   });
   return {
     success: true,
-    message: `Agent approved successfully`,
+    message: `Agent ${env.AGENT_APPROVED} successfully`,
     data: {
       agentStatus: env.AGENT_APPROVED,
       role: Role.AGENT,
@@ -155,14 +191,14 @@ const suspendAgent = async (id: string) => {
     );
   }
   if ((isExistAgent.agentStatus as string) === env.AGENT_SUSPEND) {
-    throw new AppError(`Agent already suspend`, httpStatusCode.FORBIDDEN);
+    throw new AppError(`Agent already ${env.AGENT_SUSPEND}`, httpStatusCode.FORBIDDEN);
   }
   await User.findByIdAndUpdate(id, {
     agentStatus: env.AGENT_SUSPEND,
   });
   return {
     success: true,
-    message: `Agent suspend successfully`,
+    message: `Agent ${env.AGENT_SUSPEND} successfully`,
     data: {
       agentStatus: env.AGENT_SUSPEND,
       role: Role.AGENT,
@@ -178,5 +214,5 @@ export const adminServices = {
   getAllWallets,
   activeWallet,
   blockedWallet,
-  getAllTransaction
+  getAllTransaction,
 };
