@@ -10,4 +10,6 @@ export const env = {
   WALLET_ACTIVE: process.env.WALLET_ACTIVE as string,
   WALLET_BLOCKED: process.env.WALLET_BLOCKED as string,
   BCRYPT_PASS_NUMBER: Number(process.env.BCRYPT_PASS_NUMBER),
+  MAX_NUMBER: Number(process.env.MAX_NUMBER),
+  MIN_NUMBER: Number(process.env.MIN_NUMBER),
 };

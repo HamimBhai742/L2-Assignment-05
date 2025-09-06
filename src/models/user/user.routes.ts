@@ -20,11 +20,11 @@ router.post(
 router.put(
   '/update',
   validationRequest(updateUserZodSchema),
-  checkAuth(Role.USER),
+  checkAuth(...Object.values(Role)),
   userController.updateUser
 );
 
-router.get('/me', checkAuth(Role.USER), userController.getMeUser);
+router.get('/me', checkAuth(...Object.values(Role)), userController.getMeUser);
 
 router.get(
   '/:phone',
@@ -42,7 +42,7 @@ router.post(
 router.put(
   '/change-pin',
   validationRequest(changePinZodSchema),
-  checkAuth(Role.USER),
+  checkAuth(...Object.values(Role)),
   userController.changePIN
 );
 

@@ -28,7 +28,12 @@ app.use(urlencoded());
 
 app.use(
   cors({
-    origin: ['http://localhost:5173','http://localhost:5174'],
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://assignment-06-nine.vercel.app',
+      'https://assignment-05-lemon.vercel.app',
+    ],
     credentials: true,
   })
 );
