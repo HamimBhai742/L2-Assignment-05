@@ -19,7 +19,7 @@ export class QueryBuilder<T> {
     return this;
   }
 
-  search(searchFields:string[]): this {
+  search(searchFields: string[]): this {
     const searchQuery = this.query.search || '';
     const search = {
       $or: searchFields.map((sf) => ({
@@ -48,6 +48,10 @@ export class QueryBuilder<T> {
     const fildesFilter = this.query.fields?.split(',').join(' ');
     this.modelQuery = this.modelQuery.select(fildesFilter);
     return this;
+  }
+
+  count() {
+    return this.modelQuery.countDocuments();
   }
 
   build() {

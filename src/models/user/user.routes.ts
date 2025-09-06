@@ -1,13 +1,49 @@
 import { Router } from 'express';
 import { userController } from './user.controller';
 import { validationRequest } from '../../middlewares/zod.validation';
-import { createUserZodSchema } from './user.zodSchema';
+import {
+  changePinZodSchema,
+  createUserZodSchema,
+  matchPinZodeSchema,
+  updateUserZodSchema,
+} from './user.zodSchema';
+import { checkAuth } from '../../middlewares/jwt.verify';
+import { Role } from './user.interface';
 const router = Router();
 
 router.post(
   '/register',
   validationRequest(createUserZodSchema),
   userController.createUser
+);
+
+router.put(
+  '/update',
+  validationRequest(updateUserZodSchema),
+  checkAuth(Role.USER),
+  userController.updateUser
+);
+
+router.get('/me', checkAuth(Role.USER), userController.getMeUser);
+
+router.get(
+  '/:phone',
+  checkAuth(...Object.values(Role)),
+  userController.getSingleUser
+);
+
+router.post(
+  '/match-pin/:phone',
+  validationRequest(matchPinZodeSchema),
+  checkAuth(Role.AGENT),
+  userController.matchUserPin
+);
+
+router.put(
+  '/change-pin',
+  validationRequest(changePinZodSchema),
+  checkAuth(Role.USER),
+  userController.changePIN
 );
 
 export const userRoutes = router;

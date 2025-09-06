@@ -14,6 +14,7 @@ import {
   createTransaction,
   createTransactionType,
 } from '../../utils/transaction';
+import { date } from 'zod';
 interface Payload {
   to: string;
   amount: number;
@@ -138,6 +139,7 @@ const withdrawMoney = async (userId: string, amount: number) => {
 //send money to another user wallet
 const sendMoney = async (userId: string, payload: Payload) => {
   const { to, amount } = payload;
+  console.log(payload);
   if (!to || !amount) {
     throw new AppError(
       'Receiver number and amount are required',
@@ -191,7 +193,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       );
     }
     let fee = 0;
-    if (amount > 100) {
+    if (amount >= 100) {
       fee = 5;
     }
     const updateSenderAmount =
@@ -215,7 +217,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
       { new: true, runValidators: true, session }
     );
 
-    await createTransaction(
+    const transaction = await createTransaction(
       TransactionType.SEND_MONEY,
       trnxId,
       amount,
@@ -256,9 +258,9 @@ const sendMoney = async (userId: string, payload: Payload) => {
       wallet: {
         receiver: to,
         availableBalance: updateSenderAmount,
-        trnxId,
         status: senderWallet!.status,
       },
+      transaction: transaction[0],
     };
   } catch (error) {
     await session.abortTransaction();
@@ -270,6 +272,7 @@ const sendMoney = async (userId: string, payload: Payload) => {
 //cash in agent add to user wallet
 const cashIn = async (agentId: string, payload: Payload) => {
   const { to, amount } = payload;
+  console.log('first', payload);
   if (!to || !amount) {
     throw new AppError(
       'Cash-in number and amount are required',
@@ -386,10 +389,13 @@ const cashIn = async (agentId: string, payload: Payload) => {
     return {
       message: 'Cash-in successfully',
       wallet: {
-        cashIn: recipientUser.phone,
+        recipient: recipientUser.name,
+        amount,
+        phone: recipientUser.phone,
         availableBlance: updateSenderAmount,
         commission,
         walletStatus: senderWallet!.status,
+        trnxId,
       },
     };
   } catch (error) {
@@ -524,10 +530,13 @@ const cashOut = async (agentId: string, payload: Payload) => {
     return {
       message: 'Cash-out successfully',
       wallet: {
-        cashIn: recipientUser.phone,
-        newBlance: updateReceiverAmount,
+        recipient: recipientUser.name,
+        amount,
+        phone: recipientUser.phone,
+        availableBlance: updateReceiverAmount,
         commission,
-        walletStatus: receiverWallet!.status,
+        walletStatus: recipientWallet!.status,
+        trnxId,
       },
     };
   } catch (error) {

@@ -9,4 +9,5 @@ export const env = {
   AGENT_SUSPEND: process.env.AGENT_SUSPEND as string,
   WALLET_ACTIVE: process.env.WALLET_ACTIVE as string,
   WALLET_BLOCKED: process.env.WALLET_BLOCKED as string,
+  BCRYPT_PASS_NUMBER: Number(process.env.BCRYPT_PASS_NUMBER),
 };

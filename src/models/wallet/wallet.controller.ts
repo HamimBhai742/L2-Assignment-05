@@ -23,6 +23,7 @@ const withdrawMoney = createAsyncFunction(
   async (req: Request, res: Response) => {
     const { userId } = req.user as JwtPayload;
     const amount = Number(req.body.amount);
+    console.log(amount,userId);
     const data = await walletServices.withdrawMoney(userId, amount);
 
     //send response
@@ -45,7 +46,7 @@ const sendMoney = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.CREATED,
     success: true,
     message: data.message,
-    data: data.wallet,
+    data,
   });
 });
 

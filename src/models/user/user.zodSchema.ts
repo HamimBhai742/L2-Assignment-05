@@ -4,7 +4,12 @@ const pin6Strong =
   /^(?!0)(?!.*(\d)\1{5})(?!123456|234567|345678|456789)(?!987654|876543|765432|654321)\d{6}$/;
 
 export const createUserZodSchema = z.object({
-  name: z.string(),
+  name: z
+    .string()
+    .regex(
+      /^[A-Za-z]+(?: [A-Za-z]+){0,2}$/,
+      'Name must be a string containing only letters'
+    ),
   phone: z
     .string()
     .min(11)
@@ -19,4 +24,57 @@ export const createUserZodSchema = z.object({
   role: z.enum(Role).optional(),
   isActive: z.boolean().optional(),
   agentStatus: z.enum(AgentStatus).optional(),
+});
+
+export const updateUserZodSchema = z.object({
+  name: z
+    .string()
+    .regex(
+      /^[A-Za-z]+(?: [A-Za-z]+){0,2}$/,
+      'Name must be a string containing only letters'
+    )
+    .optional(),
+  phone: z
+    .string()
+    .min(11)
+    .regex(/^(?:\+?88)?01[3-9]\d{8}$/, 'Invalid Bangladesh Number')
+    .optional(),
+  password: z
+    .string()
+    .min(6, 'Pin must be at least 6 characters long')
+    .regex(
+      pin6Strong,
+      'Pin must be a strong 6-digit pin without repeating digits or sequential numbers'
+    )
+    .optional(),
+  role: z.enum(Role).optional(),
+  isActive: z.boolean().optional(),
+  agentStatus: z.enum(AgentStatus).optional(),
+});
+
+export const changePinZodSchema = z.object({
+  currentPIN: z
+    .string()
+    .min(6, 'Pin must be at least 6 characters long')
+    .regex(
+      pin6Strong,
+      'Pin must be a strong 6-digit pin without repeating digits or sequential numbers'
+    ),
+  newPIN: z
+    .string()
+    .min(6, 'Pin must be at least 6 characters long')
+    .regex(
+      pin6Strong,
+      'Pin must be a strong 6-digit pin without repeating digits or sequential numbers'
+    ),
+});
+
+export const matchPinZodeSchema = z.object({
+  pin: z
+    .string()
+    .min(6, 'Pin must be at least 6 characters long')
+    .regex(
+      pin6Strong,
+      'Pin must be a strong 6-digit pin without repeating digits or sequential numbers'
+    ),
 });

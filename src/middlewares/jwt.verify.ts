@@ -4,7 +4,7 @@ import httpStatusCode from 'http-status-codes';
 import { verifyJwtToken } from '../utils/token.create.verfy.fn';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/user/user.model';
-import { AgentStatus  } from '../models/user/user.interface';
+import { AgentStatus } from '../models/user/user.interface';
 import { Wallet } from '../models/wallet/wallet.model';
 import { WalletStatus } from '../models/wallet/wallet.interface';
 import { env } from '../config/env';
@@ -12,7 +12,7 @@ export const checkAuth =
   (...authRole: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization;
+      const token = req.headers.authorization || req.cookies.accessToken;
       if (!token) {
         throw new AppError(
           'Access denied. No token provided.',
@@ -41,7 +41,10 @@ export const checkAuth =
       }
 
       if (isExistWallet.status === WalletStatus.BLOCKED) {
-        throw new AppError("Wallet is blocked.So you can't make any transactions.", httpStatusCode.FORBIDDEN);
+        throw new AppError(
+          "Wallet is blocked.So you can't make any transactions.",
+          httpStatusCode.FORBIDDEN
+        );
       }
 
       if (!authRole.includes(decoded.role)) {

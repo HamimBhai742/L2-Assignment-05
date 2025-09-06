@@ -6,7 +6,9 @@ import { Transaction } from './transaction.model';
 //view user own transactions
 const getMyTransactoins = async (id: string, query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(
-    Transaction.find({ initiatedBy: id }),
+    Transaction.find({ initiatedBy: id })
+      .populate('from', 'name phone role status')
+      .populate('to', 'name phone role status'),
     query
   );
   const myTnx = await queryBuilder
@@ -16,8 +18,18 @@ const getMyTransactoins = async (id: string, query: Record<string, string>) => {
     .sort()
     .select()
     .build();
-  const countDocuments = await Transaction.countDocuments({ initiatedBy: id });
-  const metaData = await queryBuilder.getMeta(countDocuments);
+
+  const totalItems = await new QueryBuilder(
+    Transaction.find({ initiatedBy: id }),
+    query
+  )
+    .filter()
+    .search(transactionSearchFields)
+    .count();
+  console.log(totalItems);
+
+  // const countDocuments = await Transaction.countDocuments({ initiatedBy: id });
+  const metaData = await queryBuilder.getMeta(totalItems);
   return {
     myTnx,
     metaData,
