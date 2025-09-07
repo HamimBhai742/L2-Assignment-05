@@ -46,7 +46,7 @@ const addMoney = async (userId: string, amount: number) => {
     const transaction = await Transaction.create(
       [
         {
-          type: TransactionType.ADD_MONEY,
+          type: TransactionType.DEPOSIT,
           transactionId: trnxId,
           to: userId,
           amount: amount,
@@ -59,7 +59,7 @@ const addMoney = async (userId: string, amount: number) => {
 
     await session.commitTransaction();
     return {
-      message: 'Money added successfully',
+      message: 'Money deposited successfully',
       wallet: {
         user: wallet!.user,
         balance: updateAmount,
@@ -139,7 +139,6 @@ const withdrawMoney = async (userId: string, amount: number) => {
 //send money to another user wallet
 const sendMoney = async (userId: string, payload: Payload) => {
   const { to, amount } = payload;
-  console.log(payload);
   if (!to || !amount) {
     throw new AppError(
       'Receiver number and amount are required',
@@ -272,7 +271,6 @@ const sendMoney = async (userId: string, payload: Payload) => {
 //cash in agent add to user wallet
 const cashIn = async (agentId: string, payload: Payload) => {
   const { to, amount } = payload;
-  console.log('first', payload);
   if (!to || !amount) {
     throw new AppError(
       'Cash-in number and amount are required',

@@ -59,7 +59,6 @@ const updateUser = createAsyncFunction(async (req: Request, res: Response) => {
 
 const changePIN = createAsyncFunction(async (req: Request, res: Response) => {
   const { userId } = req.user as JwtPayload;
-  console.log(req.body, 'sssssssss');
   const data = await userServices.changePIN(userId, req.body);
 
   //send response

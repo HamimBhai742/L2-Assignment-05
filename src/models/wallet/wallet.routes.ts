@@ -4,7 +4,7 @@ import { checkAuth } from '../../middlewares/jwt.verify';
 import { Role } from '../user/user.interface';
 const router = Router();
 
-router.post('/add-money', checkAuth(Role.USER), walletController.addMoney);
+router.post('/deposit-money', checkAuth(Role.USER), walletController.addMoney);
 
 router.post(
   '/withdraw-money',

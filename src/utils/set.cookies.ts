@@ -9,6 +9,7 @@ export const setCookies = (res: Response, token: IToken) => {
     res.cookie('accessToken', token.accessToken, {
       httpOnly: true,
       secure: false,
+      // sameSite:'none'
     });
   }
 };

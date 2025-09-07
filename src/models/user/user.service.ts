@@ -13,7 +13,6 @@ import { env } from '../../config/env';
 import bcryptjs from 'bcrypt';
 //create new user
 const createUser = async (payload: Partial<IUser>) => {
-  console.log(payload);
   const { password, phone, role, ...reset } = payload;
   const isExsistUser = await User.findOne({ phone });
   if (isExsistUser) {
@@ -98,9 +97,7 @@ const updateUser = async (id: string, payload: Partial<IUpdateUser>) => {
 };
 
 const changePIN = async (id: string, payload: Partial<IUpdatePIN>) => {
-  console.log(payload);
   const { currentPIN, newPIN } = payload;
-  console.log(currentPIN, newPIN, env.BCRYPT_PASS_NUMBER);
   const fiUser = await User.findById(id);
   const match = await bcryptjs.compare(currentPIN as string, fiUser!.password);
   if (!match) {
@@ -125,7 +122,6 @@ const changePIN = async (id: string, payload: Partial<IUpdatePIN>) => {
 };
 
 const matchUserPin = async (phone: string, pin: string) => {
-  console.log(pin)
   const user = await User.findOne({ phone });
   const match = await bcryptjs.compare(pin, user?.password as string);
   if (!match) {

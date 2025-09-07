@@ -24,7 +24,6 @@ export const globalErrorHandler = (
   };
 
   if (err.name === 'ZodError') {
-    console.log(err.issues);
     statusCode = 400;
     message = 'Zod Validation Error';
     err.issues.forEach((i: any) => {
@@ -41,7 +40,6 @@ export const globalErrorHandler = (
   } else if (err instanceof Error) {
     message = err.message;
   }
-  console.log(errorSource);
   res.status(statusCode).json({
     success: false,
     message,

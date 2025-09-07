@@ -66,7 +66,7 @@ export const matchPIN = createAsyncFunction(
     const match = await bcryptjs.compare(pin, user?.password as string);
 
     if (!match) {
-      return next(new AppError('Invalid PIN', httpStatusCode.UNAUTHORIZED));
+      return next(new AppError('Pin does not match', httpStatusCode.UNAUTHORIZED));
     }
 
     //send response

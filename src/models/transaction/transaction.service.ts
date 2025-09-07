@@ -30,7 +30,6 @@ const getMyTransactoins = async (id: string, query: Record<string, string>) => {
     .filter()
     .search(transactionSearchFields)
     .count();
-  console.log(totalItems);
 
   // const countDocuments = await Transaction.countDocuments({ initiatedBy: id });
   const metaData = await queryBuilder.getMeta(totalItems);
@@ -180,8 +179,46 @@ const lastMonthTransactions = async (id: string) => {
       },
     },
   ]);
+  const lastTotalSendMoney = await Transaction.aggregate([
+    {
+      $match: {
+        initiatedBy: new mongoose.Types.ObjectId(id),
+        type: 'send_money',
+        createdAt: {
+          $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalTransactions: { $sum: 1 },
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+  ]);
+  const lastTotalReciveMoney = await Transaction.aggregate([
+    {
+      $match: {
+        initiatedBy: new mongoose.Types.ObjectId(id),
+        type: 'receive_money',
+        createdAt: {
+          $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalTransactions: { $sum: 1 },
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+  ]);
   return {
     lastMonth: last[0],
+    lastMonthSendMoney: lastTotalSendMoney[0],
+    lastMonthReciveMoney: lastTotalReciveMoney[0],
   };
 };
 export const transactionServices = {
