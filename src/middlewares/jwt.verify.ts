@@ -34,6 +34,13 @@ export const checkAuth =
           httpStatusCode.FORBIDDEN
         );
       }
+      if (isExist.isActive === false) {
+        throw new AppError(
+          `User is blocked.So you can't make any transactions.`,
+          httpStatusCode.FORBIDDEN
+        );
+      }
+
       const isExistWallet = await Wallet.findOne({ user: isExist._id });
 
       if (!isExistWallet) {
