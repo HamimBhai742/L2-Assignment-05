@@ -7,6 +7,7 @@ export const env = {
   TRNX_SECRET: process.env.TRNX_SECRET as string,
   AGENT_APPROVED: process.env.AGENT_APPROVED as string,
   AGENT_SUSPEND: process.env.AGENT_SUSPEND as string,
+  AGENT_REACTIVE: process.env.AGENT_REACTIVE as string,
   WALLET_ACTIVE: process.env.WALLET_ACTIVE as string,
   WALLET_BLOCKED: process.env.WALLET_BLOCKED as string,
   BCRYPT_PASS_NUMBER: Number(process.env.BCRYPT_PASS_NUMBER),

@@ -12,7 +12,12 @@ const getAllUsers = createAsyncFunction(async (req: Request, res: Response) => {
     statusCode: httpStatusCode.OK,
     success: true,
     message: 'Retrieved all users successfully',
-    data: data.allUsers,
+    data: {
+      users: data.allUsers,
+      activeUsers: data.activeUser,
+      blockedUsers: data.blockedUsers,
+      totalUsers: data.totalUsers,
+    },
     metadata: data.metaData,
   });
 });
@@ -28,7 +33,13 @@ const getAllAgents = createAsyncFunction(
       statusCode: httpStatusCode.OK,
       success: true,
       message: 'Retrieved all agents successfully',
-      data: data.allAgents,
+      data: {
+        agents: data.allAgents,
+        pendingAgents: data.pendingAgents,
+        approvedAgents: data.approvedAgents,
+        suspendAgents: data.suspendAgents,
+        totalAgents: data.totalAgents,
+      },
       metadata: data.metaData,
     });
   }
@@ -75,7 +86,7 @@ const approvedAgent = createAsyncFunction(
       statusCode: httpStatusCode.ACCEPTED,
       success: true,
       message: data.message,
-      data: data.data,
+      data: null,
     });
   }
 );
@@ -89,7 +100,22 @@ const suspendAgent = createAsyncFunction(
       statusCode: httpStatusCode.ACCEPTED,
       success: true,
       message: data.message,
-      data: data.data,
+      data: null,
+    });
+  }
+);
+
+const reactiveAgent = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    console.log(id);
+    const data = await adminServices.reactiveAgent(id);
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.ACCEPTED,
+      success: true,
+      message: data.message,
+      data: null,
     });
   }
 );
@@ -122,13 +148,70 @@ const blockedWallet = createAsyncFunction(
   }
 );
 
+const manageUser = createAsyncFunction(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  console.log(id, status);
+  const data = await adminServices.manageUser(status, id);
+  //send response
+  sendResponse(res, {
+    statusCode: httpStatusCode.ACCEPTED,
+    success: true,
+    message: `User ${status} successfully`,
+    data: null,
+  });
+});
+
+const deleteUser = createAsyncFunction(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const data = await adminServices.deletedUser(id);
+  //send response
+  sendResponse(res, {
+    statusCode: httpStatusCode.ACCEPTED,
+    success: true,
+    message: data.message,
+    data: null,
+  });
+});
+
+const adminOverView = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const data = await adminServices.adminOverView();
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.ACCEPTED,
+      success: true,
+      message: 'Success',
+      data,
+    });
+  }
+);
+
+const transactionAnalytics = createAsyncFunction(
+  async (req: Request, res: Response) => {
+    const data = await adminServices.transactionAnalytics();
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.ACCEPTED,
+      success: true,
+      message: 'Success',
+      data,
+    });
+  }
+);
+
 export const adminController = {
   approvedAgent,
   suspendAgent,
+  reactiveAgent,
   activeWallet,
   getAllUsers,
+  deleteUser,
   getAllAgents,
   getAllWallets,
   blockedWallet,
   getAllTransaction,
+  manageUser,
+  adminOverView,
+  transactionAnalytics
 };

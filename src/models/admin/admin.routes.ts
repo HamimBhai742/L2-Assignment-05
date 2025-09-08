@@ -17,6 +17,12 @@ router.get(
   adminController.getAllTransaction
 );
 
+router.get('/overview', checkAuth(Role.ADMIN), adminController.adminOverView);
+router.get(
+  '/transaction-analytics',
+  checkAuth(Role.ADMIN),
+  adminController.transactionAnalytics
+);
 router.patch(
   '/agents-approved/:id',
   checkAuth(Role.ADMIN),
@@ -28,6 +34,19 @@ router.patch(
   checkAuth(Role.ADMIN),
   adminController.suspendAgent
 );
+router.patch(
+  '/agents-reactive/:id',
+  checkAuth(Role.ADMIN),
+  adminController.reactiveAgent
+);
+
+router.patch(
+  '/user-status/:id',
+  checkAuth(Role.ADMIN),
+  adminController.manageUser
+);
+
+router.delete('/user/:id', checkAuth(Role.ADMIN), adminController.deleteUser);
 
 router.patch(
   '/wallets/active/:id',
