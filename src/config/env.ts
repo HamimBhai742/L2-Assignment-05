@@ -4,6 +4,8 @@ export const env = {
   DB_URL: process.env.MONGOOSE_URL,
   JWT_SECRET: process.env.JWT_SECRET as string,
   JWT_EXPIRATION: process.env.JWT_EXPIRATION as string,
+  JWT_REFRESH_TOKEN: process.env.JWT_REFRESH_TOKEN as string,
+  JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION as string,
   TRNX_SECRET: process.env.TRNX_SECRET as string,
   AGENT_APPROVED: process.env.AGENT_APPROVED as string,
   AGENT_SUSPEND: process.env.AGENT_SUSPEND as string,

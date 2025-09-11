@@ -13,6 +13,11 @@ router.post(
   authController.loggedInUser
 );
 
+router.post(
+  '/refresh-token',
+  authController.createNewAccessTokenUsingRefreshToken
+);
+
 router.get(
   '/check',
   checkAuth(...Object.values(Role)),

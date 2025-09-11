@@ -15,3 +15,5 @@ export const verifyJwtToken = (token: string, secret: string) => {
   const veryfiedToken = jwt.verify(token, secret);
   return veryfiedToken;
 };
+
+

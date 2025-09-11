@@ -5,7 +5,10 @@ import { sendResponse } from '../../utils/send.response';
 import httpStatusCode from 'http-status-codes';
 import passport from 'passport';
 import { AppError } from '../../error/coustom.error.handel';
-import { createUserToken } from '../../utils/jwt.token';
+import {
+  createNewAccessTokeUsingRefreshToken,
+  createUserToken,
+} from '../../utils/jwt.token';
 import { setCookies } from '../../utils/set.cookies';
 import bcryptjs from 'bcrypt';
 import { User } from '../user/user.model';
@@ -39,6 +42,7 @@ const loggedInUser = createAsyncFunction(
         message: 'You have logged in successfully',
         data: {
           accessToken: userToken.accessToken,
+          refreshToken: userToken.refreshToken,
           user: userData,
         },
       });
@@ -46,7 +50,31 @@ const loggedInUser = createAsyncFunction(
   }
 );
 
-export const checkLoginUser = createAsyncFunction(
+const createNewAccessTokenUsingRefreshToken = createAsyncFunction(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    const newAccessToken = await createNewAccessTokeUsingRefreshToken(
+      refreshToken
+    );
+    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken');
+    //set cookie
+    setCookies(res, { accessToken: newAccessToken });
+
+    //send response
+    sendResponse(res, {
+      statusCode: httpStatusCode.OK,
+      success: true,
+      message: 'You have logged in successfully',
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+  }
+);
+
+const checkLoginUser = createAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     //send response
     sendResponse(res, {
@@ -58,7 +86,7 @@ export const checkLoginUser = createAsyncFunction(
   }
 );
 
-export const matchPIN = createAsyncFunction(
+const matchPIN = createAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const pin = req.params.pin;
     const { userId } = req.user as JwtPayload;
@@ -66,7 +94,9 @@ export const matchPIN = createAsyncFunction(
     const match = await bcryptjs.compare(pin, user?.password as string);
 
     if (!match) {
-      return next(new AppError('Pin does not match', httpStatusCode.UNAUTHORIZED));
+      return next(
+        new AppError('Pin does not match', httpStatusCode.UNAUTHORIZED)
+      );
     }
 
     //send response
@@ -79,9 +109,10 @@ export const matchPIN = createAsyncFunction(
   }
 );
 
-export const logout = createAsyncFunction(
+const logout = createAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
       success: true,
@@ -96,4 +127,5 @@ export const authController = {
   checkLoginUser,
   logout,
   matchPIN,
+  createNewAccessTokenUsingRefreshToken,
 };
