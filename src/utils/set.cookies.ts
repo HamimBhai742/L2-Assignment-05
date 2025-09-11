@@ -9,8 +9,8 @@ export const setCookies = (res: Response, token: IToken) => {
   if (token?.accessToken) {
     res.cookie('accessToken', token.accessToken, {
       httpOnly: true,
-      secure: false,
-      // sameSite:'none'
+      secure: true,
+      sameSite:'none'
     });
   }
 
@@ -18,8 +18,8 @@ export const setCookies = (res: Response, token: IToken) => {
     console.log(token)
     res.cookie('refreshToken', token.refreshToken, {
       httpOnly: true,
-      secure: false,
-      // sameSite:'none'
+      secure: true,
+      sameSite:'none'
     });
   }
 };
