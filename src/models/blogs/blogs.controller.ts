@@ -45,4 +45,38 @@ const getSingleBlog = createAsyncFunction(
   }
 );
 
-export const blogController = { createBlog, getAllBlogs, getSingleBlog };
+const updateBlog = createAsyncFunction(async (req: Request, res: Response) => {
+  const payload = {
+    ...req.body,
+    image: req?.file?.path,
+  };
+  console.log(req.body)
+  console.log(req.params.id)
+  const data = await blogServices.updateBlog(req.params.id as string, payload);
+  //send response
+  sendResponse(res, {
+    statusCode: httpStatusCode.OK,
+    success: true,
+    message: 'Blog updated successfully',
+    data,
+  });
+});
+
+const deleteBlog = createAsyncFunction(async (req: Request, res: Response) => {
+  const data = await blogServices.deleteBlog(req.params.id as string);
+  //send response
+  sendResponse(res, {
+    statusCode: httpStatusCode.OK,
+    success: true,
+    message: 'Blog deleted successfully',
+    data,
+  });
+});
+
+export const blogController = {
+  createBlog,
+  getAllBlogs,
+  getSingleBlog,
+  updateBlog,
+  deleteBlog,
+};

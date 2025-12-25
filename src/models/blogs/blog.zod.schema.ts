@@ -9,3 +9,15 @@ export const createBlogZodSchema = z.object({
   image: z.string(),
   tags: z.array(z.string()),
 });
+
+export const updateBlogZodSchema = z.object({
+  title: z.string().optional(),
+  excerpt: z.string().optional(),
+  content: z.string().optional(),
+  author: z.string().optional(),
+  category: z.string().optional(),
+  image: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+});
+
+
