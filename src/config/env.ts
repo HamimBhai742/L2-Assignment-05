@@ -15,4 +15,7 @@ export const env = {
   BCRYPT_PASS_NUMBER: Number(process.env.BCRYPT_PASS_NUMBER),
   MAX_NUMBER: Number(process.env.MAX_NUMBER),
   MIN_NUMBER: Number(process.env.MIN_NUMBER),
+  CLOUDINARY_API_NAME: process.env.CLOUDINARY_API_NAME as string,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
 };
